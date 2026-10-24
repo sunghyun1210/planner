@@ -244,7 +244,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
   background:conic-gradient(#f9b4b4,#fcd5a5,#fbe7a1,#b5e5bb,#a5e1e8,#a8d5f5,#c3bff3,#efbde0,#f9b4b4)}
 .cpop .pickc input,.colors .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;display:block;padding:0;border:0}
 .cpop .cmore{margin:8px 0 0;text-align:right}
-.cpop .cedit,.colors .cedit,.colors .crestore{font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.cpop .cedit,.colors .cedit,.colors .crestore{white-space:nowrap;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 .cpop .cedit:hover,.colors .cedit:hover,.colors .crestore:hover{color:var(--ink)}
 .cpop.editing button[data-c]{position:relative}
 .cpop.editing button[data-c]::after{content:"×";position:absolute;inset:0;display:grid;place-content:center;font-size:16px;font-weight:700;color:#4a2236;background:rgba(255,255,255,.45);border-radius:50%}
@@ -257,10 +257,10 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .cpop [data-sw]{cursor:grab}
 .cpop .sortable-ghost{opacity:.4}
 .cpop small{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px}
-.cpop div{display:grid;grid-template-columns:repeat(6,24px);gap:7px}
-.cpop button{width:24px;height:24px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--line);transition:transform .1s}
-.cpop button:hover{transform:scale(1.15)}
-.cpop button.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink)}
+.cpop div{display:grid;grid-template-columns:repeat(7,24px);gap:7px}
+.cpop div button{width:24px;height:24px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--line);transition:transform .1s}
+.cpop div button:hover{transform:scale(1.15)}
+.cpop div button.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink)}
 .item .pill{cursor:pointer}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20;font-size:14px}
 .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
@@ -498,12 +498,15 @@ let editing=null, selTags=new Set();
 let colorEdit=false;
 const palette=()=>{
   const base=[...COLORS.filter(c=>!db.hiddenColors.includes(c)),...db.customColors],ord=db.paletteOrder||[];
-  return [...ord.filter(c=>base.includes(c)),...base.filter(c=>!ord.includes(c))];   // dragged order first, new colours at the end
+  const list=[...ord.filter(c=>base.includes(c)),...base.filter(c=>!ord.includes(c))];   // dragged order first, new colours at the end
+  const i=list.indexOf(MAIN_COLOR);if(i>0)list.unshift(...list.splice(i,1));   // the main pink #F7B5CC is always the first swatch
+  return list;
 };
 const savePaletteOrder=list=>{db.paletteOrder=list;save()};
 const swatchSort=(el,pick)=>Sortable.create(el,{draggable:'[data-sw]',filter:'.cdel,.pick,.pickc,.cbar',preventOnFilter:false,
   animation:220,easing:'cubic-bezier(.2,.8,.2,1)',delay:140,delayOnTouchOnly:true,ghostClass:'sortable-ghost',chosenClass:'sortable-chosen',
   onEnd:()=>savePaletteOrder([...el.querySelectorAll('[data-sw]')].map(x=>x.dataset.sw))});
+const MAIN_COLOR='#f7b5cc';
 const rememberColor=c=>{
   if(COLORS.includes(c)){db.hiddenColors=db.hiddenColors.filter(x=>x!==c);save();return}   // a deleted default comes back when picked again
   db.customColors=[c,...db.customColors.filter(x=>x!==c)].slice(0,60);save();
@@ -556,7 +559,7 @@ function openDlg(ev,pre){
   $('#dlgTitle').textContent=ev?'Edit event':'New event';
   $('#fTitle').value=ev?ev.title:'';
   $('#fDate').value=v.date;$('#fStart').value=v.start;$('#fEnd').value=v.end;
-  const c=ev?ev.color:COLORS[0];
+  const c=ev?ev.color:palette()[0];
   colorEdit=false;renderColors(c);
   setDlgColor(c);
   selTags=new Set(ev?ev.tags||[]:[]);$('#fTagNew').value='';renderTags();
