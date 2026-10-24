@@ -243,6 +243,11 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .colors .cbar{grid-column:1/-1;display:flex;gap:14px;margin-top:2px}
 .colors label{position:relative}
 .colors .cdel{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--ink);color:var(--card);font-size:12px;line-height:16px;display:grid;place-content:center;z-index:2}
+.colors [data-sw]{cursor:grab}
+.colors .sortable-chosen span{transform:scale(1.18);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.colors .sortable-ghost{opacity:.4}
+.cpop [data-sw]{cursor:grab}
+.cpop .sortable-ghost{opacity:.4}
 .cpop small{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px}
 .cpop div{display:grid;grid-template-columns:repeat(6,24px);gap:7px}
 .cpop button{width:24px;height:24px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--line);transition:transform .1s}
@@ -338,7 +343,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 let db={events:[],todos:[],tags:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.events&&s.todos)db=s}catch(e){}
-db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];db.hiddenColors=db.hiddenColors||[];
+db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];db.hiddenColors=db.hiddenColors||[];db.paletteOrder=db.paletteOrder||[];
 const normSettings=()=>{const o=db.settings=db.settings||{};o.sizes=o.sizes||{};o.colors=o.colors||{}};normSettings();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
 
@@ -483,7 +488,14 @@ $('#weekBody').addEventListener('pointercancel',endDrag);
 let editing=null, selTags=new Set();
 /* colour palette: the 12 defaults + every colour you ever picked; unused ones can be deleted */
 let colorEdit=false;
-const palette=()=>[...COLORS.filter(c=>!db.hiddenColors.includes(c)),...db.customColors];
+const palette=()=>{
+  const base=[...COLORS.filter(c=>!db.hiddenColors.includes(c)),...db.customColors],ord=db.paletteOrder||[];
+  return [...ord.filter(c=>base.includes(c)),...base.filter(c=>!ord.includes(c))];   // dragged order first, new colours at the end
+};
+const savePaletteOrder=list=>{db.paletteOrder=list;save()};
+const swatchSort=(el,pick)=>Sortable.create(el,{draggable:'[data-sw]',filter:'.cdel,.pick,.pickc,.cbar',preventOnFilter:false,
+  animation:220,easing:'cubic-bezier(.2,.8,.2,1)',delay:140,delayOnTouchOnly:true,ghostClass:'sortable-ghost',chosenClass:'sortable-chosen',
+  onEnd:()=>savePaletteOrder([...el.querySelectorAll('[data-sw]')].map(x=>x.dataset.sw))});
 const rememberColor=c=>{
   if(COLORS.includes(c)){db.hiddenColors=db.hiddenColors.filter(x=>x!==c);save();return}   // a deleted default comes back when picked again
   db.customColors=[c,...db.customColors.filter(x=>x!==c)].slice(0,60);save();
@@ -497,10 +509,11 @@ function deleteColor(c){
 const checkedColor=()=>(document.querySelector('#fColors input[type=radio]:checked')||{}).value;
 function renderColors(sel){
   const all=palette(),pal=new Set(all);if(sel&&!pal.has(sel))all.push(sel);   // keep an event's older colour selectable
-  $('#fColors').innerHTML=all.map(c=>`<label style="--c:${c}"><input type="radio" name="col" value="${c}" ${c===sel?'checked':''}><span></span>${colorEdit&&pal.has(c)?`<button type="button" class="cdel" data-c="${c}" aria-label="Delete colour">×</button>`:''}</label>`).join('')
+  $('#fColors').innerHTML=all.map(c=>`<label style="--c:${c}" ${pal.has(c)?`data-sw="${c}"`:''}><input type="radio" name="col" value="${c}" ${c===sel?'checked':''}><span></span>${colorEdit&&pal.has(c)?`<button type="button" class="cdel" data-c="${c}" aria-label="Delete colour">×</button>`:''}</label>`).join('')
     +`<label class="pick" title="Pick any colour"><input type="color" id="fCustom" value="${sel||COLORS[0]}"><span></span></label>`
     +`<div class="cbar"><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button>${colorEdit&&db.hiddenColors.length?'<button type="button" class="crestore">Restore defaults</button>':''}</div>`;
 }
+swatchSort($('#fColors'));
 $('#fColors').addEventListener('click',e=>{
   const del=e.target.closest('.cdel'),cur=checkedColor();
   if(del){e.preventDefault();const c=del.dataset.c;if(!deleteColor(c))return;
@@ -724,7 +737,7 @@ $('#imp').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
   try{const d=JSON.parse(await f.text());if(!d.events||!d.todos)throw 0;
-    if(confirm('Replace current data with this backup?')){db=d;db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];db.hiddenColors=db.hiddenColors||[];normSettings();applySettings();save();renderAll(true);toast('Restored')}}
+    if(confirm('Replace current data with this backup?')){db=d;db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];db.hiddenColors=db.hiddenColors||[];db.paletteOrder=db.paletteOrder||[];normSettings();applySettings();save();renderAll(true);toast('Restored')}}
   catch(_){alert('Invalid backup file')}
   e.target.value='';
 };
@@ -801,9 +814,9 @@ function setTagColor(tag,color){
 function openTagColor(pill){
   const tag=pill.dataset.t||pill.textContent.trim();if(!tag)return;
   const r=pill.getBoundingClientRect(),cur=tagColor(tag);
-  cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+palette().map(c=>`<button data-c="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')
+  cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+palette().map(c=>`<button data-c="${c}" data-sw="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')
     +`<label class="pickc" title="Pick any colour"><input type="color" value="${cur}"></label></div><p class="cmore"><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button></p>`;
-  cpop.classList.toggle('editing',colorEdit);cpop._pill=pill;
+  cpop.classList.toggle('editing',colorEdit);cpop._pill=pill;swatchSort(cpop.querySelector('div'));
   cpop.dataset.tag=tag;cpop.hidden=false;
   const w=cpop.offsetWidth,h=cpop.offsetHeight;
   let x=r.left-w-8;if(x<8)x=Math.min(r.right+8,innerWidth-w-8);   // beside the tag; left side first (tags sit at the right edge)
