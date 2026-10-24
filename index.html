@@ -171,9 +171,11 @@ dialog label.l{display:block;font-size:11px;letter-spacing:.08em;text-transform:
 dialog input[type=date],dialog input[type=time],dialog input.tagin{width:100%;padding:9px 11px;border-radius:11px;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 4%,transparent);outline:none;transition:.15s}
 dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:focus{border-color:var(--c);background:transparent;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent)}
 .row{display:flex;gap:10px}.row>div{flex:1}
-.colors{display:grid;grid-template-columns:repeat(10,1fr);gap:7px 6px}
+.colors{display:grid;grid-template-columns:repeat(9,1fr);gap:8px 6px}
 .colors label{margin:0;cursor:pointer;display:block}
-.colors input{display:none}
+.colors input[type=radio]{display:none}
+.colors .pick{position:relative}
+.colors .pick span{background:conic-gradient(#f9b4b4,#fcd5a5,#fbe7a1,#b5e5bb,#a5e1e8,#a8d5f5,#c3bff3,#efbde0,#f9b4b4)}
 .colors span{display:block;aspect-ratio:1;border-radius:50%;background:var(--c);border:3px solid var(--card);box-shadow:0 0 0 1px var(--line);transition:transform .12s}
 .colors label:hover span{transform:scale(1.12)}
 .colors input:checked+span{box-shadow:0 0 0 2px var(--c);transform:scale(1.08)}
@@ -230,8 +232,11 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 
 .cpop{position:fixed;z-index:70;padding:8px 10px 10px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:0 12px 32px rgba(30,20,5,.25);animation:pop .14s ease}
 .cpop[hidden]{display:none}
+.cpop .pickc{position:relative;width:24px;height:24px;border-radius:50%;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px var(--line);
+  background:conic-gradient(#f9b4b4,#fcd5a5,#fbe7a1,#b5e5bb,#a5e1e8,#a8d5f5,#c3bff3,#efbde0,#f9b4b4)}
+.cpop .pickc input,.colors .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;display:block;padding:0;border:0}
 .cpop small{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px}
-.cpop div{display:grid;grid-template-columns:repeat(5,24px);gap:7px}
+.cpop div{display:grid;grid-template-columns:repeat(6,24px);gap:7px}
 .cpop button{width:24px;height:24px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px var(--line);transition:transform .1s}
 .cpop button:hover{transform:scale(1.15)}
 .cpop button.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink)}
@@ -308,8 +313,8 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 
 <script src="sortable.min.js"></script>
 <script>
-const KEY='planner-v1', COLORS=['#f7b5cc','#f9b4b4','#fbc4ab','#fcd5a5','#fbe7a1','#e9ef9f','#cfe8a0','#b5e5bb','#a6e6d2','#a5e1e8','#a8d5f5','#b3c6f6','#c3bff3','#d3bdf1','#e3bff0','#efbde0','#e9c6b8','#cfc9bd','#b7d3c9','#c8d6e5'];
-const PASTEL_NAMES=['Baby pink','Blush','Peach','Apricot','Butter','Lemon','Pistachio','Mint','Seafoam','Aqua','Sky','Baby blue','Periwinkle','Lavender','Lilac','Orchid','Dusty beige','Greige','Sage','Powder'];
+const KEY='planner-v1', COLORS=['#f7b5cc','#f4a3a3','#fbc79a','#fbe7a1','#d4e8a0','#aee3b8','#a3e0d8','#a8d5f5','#b9b9f2','#d6b8f0','#e3cdb4','#cfd4da'];
+const PASTEL_NAMES=['Pink','Coral','Orange','Yellow','Lime','Green','Teal','Sky','Periwinkle','Purple','Beige','Gray'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW=['S','M','T','W','T','F','S'];
@@ -325,7 +330,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 let db={events:[],todos:[],tags:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.events&&s.todos)db=s}catch(e){}
-db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};
+db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];
 const normSettings=()=>{const o=db.settings=db.settings||{};o.sizes=o.sizes||{};o.colors=o.colors||{}};normSettings();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
 
@@ -468,9 +473,18 @@ $('#weekBody').addEventListener('pointercancel',endDrag);
 
 /* ---- event dialog ---- */
 let editing=null, selTags=new Set();
-$('#fColors').innerHTML=COLORS.map((c,i)=>`<label style="--c:${c}"><input type="radio" name="col" value="${c}" ${i?'':'checked'}><span></span></label>`).join('');
+const rememberColor=c=>{if(COLORS.includes(c))return;db.customColors=[c,...db.customColors.filter(x=>x!==c)].slice(0,10);save()};
+function renderColors(sel){
+  const all=[...COLORS,...db.customColors];if(sel&&!all.includes(sel))all.push(sel);   // keep an event's older colour selectable
+  $('#fColors').innerHTML=all.map(c=>`<label style="--c:${c}"><input type="radio" name="col" value="${c}" ${c===sel?'checked':''}><span></span></label>`).join('')
+    +`<label class="pick" title="Pick any colour"><input type="color" id="fCustom" value="${sel||COLORS[0]}"><span></span></label>`;
+}
+renderColors(COLORS[0]);
 const setDlgColor=c=>$('#dlg').style.setProperty('--c',c);
-$('#fColors').onchange=e=>setDlgColor(e.target.value);
+$('#fColors').onchange=e=>{
+  if(e.target.id==='fCustom'){const c=e.target.value;rememberColor(c);renderColors(c);setDlgColor(c)}
+  else setDlgColor(e.target.value);
+};
 function renderTags(){
   $('#fTags').innerHTML=db.tags.map(t=>`<span class="tag ${selTags.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)}<u title="Remove from saved tags">×</u></span>`).join('');
 }
@@ -493,7 +507,7 @@ function openDlg(ev,pre){
   $('#fTitle').value=ev?ev.title:'';
   $('#fDate').value=v.date;$('#fStart').value=v.start;$('#fEnd').value=v.end;
   const c=ev?ev.color:COLORS[0];
-  document.querySelectorAll('#fColors input').forEach(r=>r.checked=r.value===c);
+  renderColors(c);
   setDlgColor(c);
   selTags=new Set(ev?ev.tags||[]:[]);$('#fTagNew').value='';renderTags();
   $('#fDel').style.display=ev?'':'none';
@@ -681,7 +695,7 @@ $('#imp').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
   try{const d=JSON.parse(await f.text());if(!d.events||!d.todos)throw 0;
-    if(confirm('Replace current data with this backup?')){db=d;db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};normSettings();applySettings();save();renderAll(true);toast('Restored')}}
+    if(confirm('Replace current data with this backup?')){db=d;db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];normSettings();applySettings();save();renderAll(true);toast('Restored')}}
   catch(_){alert('Invalid backup file')}
   e.target.value='';
 };
@@ -758,8 +772,9 @@ function setTagColor(tag,color){
 function openTagColor(pill){
   const tag=pill.dataset.t||pill.textContent.trim();if(!tag)return;
   const r=pill.getBoundingClientRect(),cur=tagColor(tag);
-  cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+COLORS.map(c=>`<button data-c="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')+'</div>';
-  cpop.hidden=false;
+  cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+[...COLORS,...db.customColors].map(c=>`<button data-c="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')
+    +`<label class="pickc" title="Pick any colour"><input type="color" value="${cur}"></label></div>`;
+  cpop.dataset.tag=tag;cpop.hidden=false;
   const w=cpop.offsetWidth,h=cpop.offsetHeight;
   let x=r.left-w-8;if(x<8)x=Math.min(r.right+8,innerWidth-w-8);   // beside the tag; left side first (tags sit at the right edge)
   cpop.style.left=x+'px';cpop.style.top=Math.max(8,Math.min(r.top+r.height/2-h/2,innerHeight-h-8))+'px';
@@ -771,6 +786,9 @@ document.addEventListener('click',e=>{
   if(pill){e.stopPropagation();openTagColor(pill);return}
   if(!e.target.closest('.cpop'))cpop.hidden=true;
 },true);
+cpop.addEventListener('change',e=>{
+  if(e.target.type!=='color'||!cpop.dataset.tag)return;
+  rememberColor(e.target.value);const other=setTagColor(cpop.dataset.tag,e.target.value);cpop.hidden=true;if(other)toast(`Swapped colours with #${other}`)});
 addEventListener('keydown',e=>{if(e.key==='Escape')cpop.hidden=true});
 $('#weekList').addEventListener('scroll',()=>cpop.hidden=true);
 
