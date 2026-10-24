@@ -85,7 +85,8 @@ input{font:inherit;color:inherit}
 .mini-grid button.out{color:var(--muted);opacity:.5}
 .mini-grid button.inweek{background:var(--accent-soft)}
 .mini-grid button:hover{outline:1px solid var(--accent)}
-.mini-grid button.today{color:var(--today);font-weight:800}
+.mini-grid .sun{color:#e5534b}.mini-grid .sat{color:#4fa3e0}
+.mini-grid button.today{background:var(--accent);color:#4a2236;font-weight:800;border-radius:99px}
 .mini-grid button.has::after{content:"";position:absolute;left:50%;bottom:2px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent)}
 
 /* weekly calendar */
@@ -99,8 +100,10 @@ input{font:inherit;color:inherit}
 .week-head div:first-child .wnav{margin:0 auto;display:block;padding-bottom:3px}
 .wnav.r{position:absolute;right:6px;top:8px}
 .week-head b{display:block;font-size:calc(var(--fs-cal) * 1.5);color:var(--ink);font-weight:600}
-.week-head .today b{color:var(--today)}
-.week-head .today{color:var(--today)}
+.week-head .sun,.week-head .sun b{color:#e5534b}
+.week-head .sat,.week-head .sat b{color:#4fa3e0}
+.week-head .today{color:var(--ink)}
+.week-head .today b{width:fit-content;margin:0 auto;min-width:1.7em;padding:0 .35em;border-radius:99px;background:var(--accent);color:#4a2236}
 .week-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;display:grid;grid-template-columns:52px repeat(7,1fr);position:relative}
 .week-body::-webkit-scrollbar{display:none}
 .tcol div{height:var(--hh);font-size:calc(var(--fs-cal) * .92);color:var(--muted);text-align:right;padding:3px 8px 0 0}
@@ -333,9 +336,9 @@ const view={y:today.getFullYear(),m:today.getMonth(),ws:wkStart(today)};
 function gotoMonth(y,m){
   view.y=y;view.m=m;
   view.ws=wkStart(new Date(y,m,1));   // first week of that month
-  renderAll();
+  renderAll();scrollToDefault();
 }
-function gotoDate(d){view.ws=wkStart(d);renderAll(true)}
+function gotoDate(d){view.ws=wkStart(d);renderAll(true);scrollToDefault()}   // navigating always resets to the start hour
 function shiftMonth(n){const d=new Date(view.y,view.m+n,1);gotoMonth(d.getFullYear(),d.getMonth())}
 
 /* ---- header ---- */
@@ -358,10 +361,10 @@ function renderMini(){
   const weeks=Math.ceil((first.getDay()+new Date(view.y,view.m+1,0).getDate())/7);
   const evDays=new Set(db.events.map(e=>e.date));
   const wsISO=iso(view.ws), weISO=iso(addDays(view.ws,6)), tISO=iso(today);
-  let h=DOW.map(d=>`<div class="dow">${d}</div>`).join('');
+  let h=DOW.map((d,i)=>`<div class="dow ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
   for(let i=0;i<weeks*7;i++){
     const d=addDays(start,i), s=iso(d);
-    const cls=[d.getMonth()!==view.m?'out':'',s>=wsISO&&s<=weISO?'inweek':'',s===tISO?'today':'',evDays.has(s)?'has':''].join(' ');
+    const cls=[d.getDay()===0?'sun':d.getDay()===6?'sat':'',d.getMonth()!==view.m?'out':'',s>=wsISO&&s<=weISO?'inweek':'',s===tISO?'today':'',evDays.has(s)?'has':''].join(' ');
     h+=`<button class="${cls}" data-d="${s}">${d.getDate()}</button>`;
   }
   $('#miniGrid').style.gridTemplateRows=`auto repeat(${weeks},1fr)`;
@@ -379,12 +382,12 @@ $('#miniGrid').onclick=e=>{
 /* ---- weekly calendar ---- */
 function setHourHeight(){
   const body=$('#weekBody'), old=hourH();
-  const hh=Math.max(22,body.clientHeight/(db.settings.hours||12));  // 12 hours visible by default
+  const hh=Math.max(22,body.clientHeight/(db.settings.hours||10));  // 10 hours visible by default
   $('#week').style.setProperty('--hh',hh+'px');
   body.scrollTop=body.scrollTop/old*hh;        // keep the same top hour on resize
 }
 const hourH=()=>parseFloat(getComputedStyle($('#week')).getPropertyValue('--hh'));
-function scrollToDefault(){const b=$('#weekBody');b.scrollTop=6*parseFloat(getComputedStyle($('#week')).getPropertyValue('--hh'))}
+function scrollToDefault(){const b=$('#weekBody');b.scrollTop=(db.settings.startHour??6)*hourH()}
 function layout(list){
   list.sort((a,b)=>a.s-b.s||b.e-a.e);
   let cl=[],end=0;
@@ -399,7 +402,7 @@ function renderWeek(){
   const body=$('#weekBody'), keep=body.scrollTop, tISO=iso(today);
   const days=[...Array(7)].map((_,i)=>addDays(view.ws,i));
   $('#weekHead').innerHTML='<div><button class="wnav" data-n="-1" aria-label="Previous week">‹</button></div>'
-    +days.map(d=>`<div class="${iso(d)===tISO?'today':''}">${DOW[d.getDay()]}<b>${d.getDate()}</b></div>`).join('')
+    +days.map(d=>`<div class="${iso(d)===tISO?'today':''} ${d.getDay()===0?'sun':d.getDay()===6?'sat':''}">${DOW[d.getDay()]}<b>${d.getDate()}</b></div>`).join('')
     +'<button class="wnav r" data-n="1" aria-label="Next week">›</button>';
   let h='<div class="tcol">'+[...Array(24)].map((_,i)=>`<div>${pad(i)}:00</div>`).join('')+'</div>';
   const nowH=today.getHours()+today.getMinutes()/60;
@@ -718,7 +721,8 @@ function buildSettings(){
     <div class="sample" id="sSample">23 October · 이번 주 할 일 Weekly</div>
     <h4>Font sizes (px)</h4>
     ${SIZES.map(([k,l,v,mn,mx,d])=>`<div class="row2"><label for="z_${k}">${l}</label><input type="range" id="z_${k}" data-k="${k}" min="${mn}" max="${mx}" step="0.5" value="${st.sizes[k]||d}"><output>${st.sizes[k]||d}</output></div>`).join('')}
-    <div class="row2"><label for="z_hours">Hours shown</label><input type="range" id="z_hours" min="4" max="24" step="1" value="${st.hours||12}"><output>${st.hours||12}</output></div>
+    <div class="row2"><label for="z_hours">Hours shown</label><input type="range" id="z_hours" min="4" max="24" step="1" value="${st.hours||10}"><output>${st.hours||10}</output></div>
+    <div class="row2"><label for="z_start">Start hour</label><input type="range" id="z_start" min="0" max="23" step="1" value="${st.startHour??6}"><output>${st.startHour??6}</output></div>
     <h4>Colours</h4>
     <div class="presets">${CLASSIC.map(([n,p])=>`<button data-p="${n}"><i style="background:linear-gradient(135deg,${p.bg} 50%,${p.accent} 50%)"></i>${n}</button>`).join('')}</div>
     <div class="swatches">${PRESETS.slice(CLASSIC.length).map(([n,p])=>`<button data-p="${n}" title="${n}" style="background:linear-gradient(135deg,${p.bg} 45%,${p.accent} 45%)"></button>`).join('')}</div>
@@ -731,6 +735,7 @@ function buildSettings(){
   $('#settings').querySelectorAll('input[type=range][data-k]').forEach(el=>el.oninput=()=>{
     const d=SIZES.find(x=>x[0]===el.dataset.k)[5];el.nextElementSibling.textContent=el.value;
     if(+el.value===d)delete st.sizes[el.dataset.k];else st.sizes[el.dataset.k]=+el.value;applySettings();save()});
+  $('#z_start').oninput=e=>{e.target.nextElementSibling.textContent=e.target.value;st.startHour=+e.target.value;save();scrollToDefault()};
   $('#z_hours').oninput=e=>{e.target.nextElementSibling.textContent=e.target.value;st.hours=+e.target.value;applySettings();save()};
   $('#settings').querySelectorAll('input[type=color]').forEach(el=>el.oninput=()=>{st.colors[el.dataset.k]=el.value;applySettings();save()});
   $('#settings').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{st.colors={...PRESETS.find(x=>x[0]===b.dataset.p)[1]};applySettings();save();buildSettings()});
@@ -782,6 +787,7 @@ applySettings();
 renderAll();
 const initView=()=>{setHourHeight();scrollToDefault()};
 initView();addEventListener('load',()=>requestAnimationFrame(initView));
+if(document.fonts)document.fonts.ready.then(initView);   // fonts change row metrics; start at the chosen hour
 addEventListener('resize',setHourHeight);
 setInterval(()=>{if(drag)return;today.setTime(Date.now());const moved=carryOver();renderWeek();renderMini();if(moved)renderTodos()},60000);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
