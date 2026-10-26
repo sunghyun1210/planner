@@ -227,7 +227,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:12.5px;border:1px solid var(--line);color:var(--muted);transition:.12s;cursor:pointer}
 .tag:hover{border-color:var(--c);color:var(--ink)}
 .tag.on{background:var(--c);border-color:var(--c);color:#4a2236;font-weight:700}
-.tag u{text-decoration:none;opacity:0;margin-left:2px;font-size:13px;line-height:1}
+.tag u{text-decoration:none;opacity:.45;margin-left:2px;font-size:13px;line-height:1}
 .tag:hover u{opacity:.7}.tag u:hover{opacity:1}
 .btns{display:flex;gap:8px;margin-top:24px;justify-content:flex-end}
 .btns button{padding:9px 18px;border-radius:11px;border:1px solid var(--line);transition:.15s}
@@ -309,7 +309,8 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .cpop .pickc{position:relative;width:24px;height:24px;border-radius:50%;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px var(--line);
   background:conic-gradient(#f9b4b4,#fcd5a5,#fbe7a1,#b5e5bb,#a5e1e8,#a8d5f5,#c3bff3,#efbde0,#f9b4b4)}
 .cpop .pickc input,.colors .pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;display:block;padding:0;border:0}
-.cpop .cmore{margin:8px 0 0;text-align:right}
+.cpop .cmore{margin:8px 0 0;display:flex;justify-content:space-between;gap:14px}
+.cpop .cdeltag{font-size:13px;color:var(--today);text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
 .cpop .cedit,.colors .cedit,.colors .crestore{white-space:nowrap;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 .cpop .cedit:hover,.colors .cedit:hover,.colors .crestore:hover{color:var(--ink)}
 .cpop.editing button[data-c]{position:relative}
@@ -610,11 +611,11 @@ $('#fColors').onchange=e=>{
   else setDlgColor(e.target.value);
 };
 function renderTags(){
-  $('#fTags').innerHTML=db.tags.map(t=>`<span class="tag ${selTags.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)}<u title="Remove from saved tags">×</u></span>`).join('');
+  $('#fTags').innerHTML=db.tags.map(t=>`<span class="tag ${selTags.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)}<u title="Delete this tag">×</u></span>`).join('');
 }
 $('#fTags').onclick=e=>{
   const el=e.target.closest('.tag');if(!el)return;const t=el.dataset.t;
-  if(e.target.tagName==='U'){db.tags=db.tags.filter(x=>x!==t);selTags.delete(t);save()}
+  if(e.target.tagName==='U'){deleteTag(t,true);return}
   else selTags.has(t)?selTags.delete(t):selTags.add(t);
   renderTags();
 };
@@ -1018,17 +1019,28 @@ function setTagColor(tag,color){
   db.tagColors[tag]=color;if(other)db.tagColors[other]=old;
   save();renderAll(true);renderTags();return other;
 }
+function deleteTag(tag,ask){
+  const hit=[...db.todos,...db.events].filter(x=>(x.tags||[]).includes(tag));
+  if(ask&&hit.length&&!confirm(`Delete #${tag}? It will also be removed from ${hit.length} item${hit.length>1?'s':''}.`))return false;
+  const snap=hit.map(x=>[x,[...x.tags]]),idx=db.tags.indexOf(tag),col=db.tagColors[tag];
+  hit.forEach(x=>x.tags=x.tags.filter(g=>g!==tag));
+  db.tags=db.tags.filter(g=>g!==tag);delete db.tagColors[tag];selTags.delete(tag);
+  save();renderAll(true);renderTags();
+  if(!ask)toast(`Deleted #${tag}`,()=>{snap.forEach(([x,t])=>x.tags=t);db.tags.splice(Math.min(idx,db.tags.length),0,tag);if(col)db.tagColors[tag]=col;save();renderAll(true);renderTags()});
+  return true;
+}
 function openTagColor(pill){
   const tag=pill.dataset.t||pill.textContent.trim();if(!tag)return;
   const r=pill.getBoundingClientRect(),cur=tagColor(tag);
   cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+palette().map(c=>`<button data-c="${c}" data-sw="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')
-    +`<label class="pickc" title="Pick any colour"><input type="color" value="#ffffff"></label></div><p class="cmore"><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button></p>`;
+    +`<label class="pickc" title="Pick any colour"><input type="color" value="#ffffff"></label></div><p class="cmore"><button type="button" class="cdeltag">Delete tag</button><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button></p>`;
   cpop.classList.toggle('editing',colorEdit);cpop._pill=pill;swatchSort(cpop.querySelector('div'));
   cpop.dataset.tag=tag;cpop.hidden=false;
   const w=cpop.offsetWidth,h=cpop.offsetHeight;
   let x=r.left-w-8;if(x<8)x=Math.min(r.right+8,innerWidth-w-8);   // beside the tag; left side first (tags sit at the right edge)
   cpop.style.left=x+'px';cpop.style.top=Math.max(8,Math.min(r.top+r.height/2-h/2,innerHeight-h-8))+'px';
   cpop.onclick=e=>{
+    if(e.target.closest('.cdeltag')){const t=cpop.dataset.tag;cpop.hidden=true;return void deleteTag(t,false)}
     if(e.target.closest('.cedit')){colorEdit=!colorEdit;return openTagColor(cpop._pill)}
     const b=e.target.closest('[data-c]');if(!b)return;
     if(colorEdit){if(deleteColor(b.dataset.c))openTagColor(cpop._pill);return}
