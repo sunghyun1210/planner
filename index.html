@@ -1034,18 +1034,26 @@ function deleteTag(tag,ask){
   if(!ask)toast(`Deleted #${tag}`,()=>{snap.forEach(([x,t])=>x.tags=t);db.tags.splice(Math.min(idx,db.tags.length),0,tag);if(col)db.tagColors[tag]=col;save();renderAll(true);renderTags()});
   return true;
 }
+// a tag pill on a to-do: "Remove tag" only detaches it from that item; the tag itself stays in your list
+function removeTagFromItem(t,tag){
+  const old=[...(t.tags||[])];
+  t.tags=old.filter(g=>g!==tag);if(t.due)syncDueEvent(t);
+  save();renderAll(true);
+  toast(`Removed #${tag} from this item`,()=>{t.tags=old;if(t.due)syncDueEvent(t);save();renderAll(true)});
+}
 function openTagColor(pill){
   const tag=pill.dataset.t||pill.textContent.trim();if(!tag)return;
+  const li=pill.closest('.item');cpop._todo=li?db.todos.find(x=>x.id===li.dataset.id)||null:null;   // opened from a to-do, or from the tag bar?
   const r=pill.getBoundingClientRect(),cur=tagColor(tag);
   cpop.innerHTML=`<small>#${esc(tag)}</small><div>`+palette().map(c=>`<button data-c="${c}" data-sw="${c}" style="--c:${c}" class="${c===cur?'on':''}" aria-label="${c}"></button>`).join('')
-    +`<label class="pickc" title="Pick any colour"><input type="color" value="#ffffff"></label></div><p class="cmore"><button type="button" class="cdeltag">Delete tag</button><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button></p>`;
+    +`<label class="pickc" title="Pick any colour"><input type="color" value="#ffffff"></label></div><p class="cmore"><button type="button" class="cdeltag">${cpop._todo?'Remove tag':'Delete tag'}</button><button type="button" class="cedit">${colorEdit?'Done':'Edit colours'}</button></p>`;
   cpop.classList.toggle('editing',colorEdit);cpop._pill=pill;swatchSort(cpop.querySelector('div'));
   cpop.dataset.tag=tag;cpop.hidden=false;
   const w=cpop.offsetWidth,h=cpop.offsetHeight;
   let x=r.left-w-8;if(x<8)x=Math.min(r.right+8,innerWidth-w-8);   // beside the tag; left side first (tags sit at the right edge)
   cpop.style.left=x+'px';cpop.style.top=Math.max(8,Math.min(r.top+r.height/2-h/2,innerHeight-h-8))+'px';
   cpop.onclick=e=>{
-    if(e.target.closest('.cdeltag')){const t=cpop.dataset.tag;cpop.hidden=true;return void deleteTag(t,false)}
+    if(e.target.closest('.cdeltag')){const t=cpop.dataset.tag,item=cpop._todo;cpop.hidden=true;return void(item?removeTagFromItem(item,t):deleteTag(t,false))}
     if(e.target.closest('.cedit')){colorEdit=!colorEdit;return openTagColor(cpop._pill)}
     const b=e.target.closest('[data-c]');if(!b)return;
     if(colorEdit){if(deleteColor(b.dataset.c))openTagColor(cpop._pill);return}
