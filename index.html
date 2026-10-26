@@ -14,7 +14,7 @@
   --bg:#ffffff; --card:#fffefb; --ink:#2b2622; --muted:#8a8177; --line:#ece6d9;
   --accent:#f7b5cc; --accent-soft:#fdeaf1; --today:#e26d5a;
   --font:"Gaegu"; --font-head:var(--font);
-  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
+  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --day-bg:#fcf9f9; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -97,7 +97,8 @@ input{font:inherit;color:inherit}
 .week-head{position:relative}
 .week-head>div:not(:first-child){cursor:pointer;transition:background .15s}
 .week-head>div:not(:first-child):hover{background:var(--accent-soft)}
-.daystrip{display:grid;grid-template-columns:52px repeat(7,1fr);flex:0 1 auto;min-height:0;max-height:calc(var(--hh) * 8);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--ink) 2%,var(--card))}
+.daystrip{display:grid;grid-template-columns:52px repeat(7,1fr);flex:0 1 auto;min-height:0;max-height:calc(var(--hh) * 8);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border-bottom:1px solid var(--line);background:var(--day-bg);
+  --ink:#2b2622;--muted:#8a8177;--line:#e9e2e0}   /* keep text readable on this light panel even in dark mode */
 .daystrip[hidden]{display:none}
 .daystrip::-webkit-scrollbar{display:none}
 .dcell{border-left:1px solid var(--line);padding:4px 6px 4px 8px;min-width:0}   /* the strip grows with the longest day (up to 8 rows, then scrolls) */
@@ -862,7 +863,7 @@ const fontCss=n=>n==='System UI'?'system-ui,-apple-system,"Segoe UI","Malgun Got
 const SIZES=[['base','Base text','--fs-base',12,26,17],['bigdate','Big date','--fs-bigdate',24,90,44],['title','Card titles','--fs-title',16,44,28],
   ['item','To-do items','--fs-item',12,36,22],['event','Calendar events','--fs-event',10,36,22],['cal','Calendar labels','--fs-cal',9,20,12],
   ['mini','Mini calendar','--fs-mini',10,22,12.5],['head','Month buttons','--fs-head',10,22,13],['pill','Tag pills','--fs-pill',10,24,15],['day','Daily to-do','--fs-day',10,28,16]];
-const COLS=[['bg','Background','--bg'],['card','Cards','--card'],['ink','Text','--ink'],['accent','Accent','--accent'],['today','Today / overdue','--today']];
+const COLS=[['bg','Background','--bg'],['card','Cards','--card'],['ink','Text','--ink'],['accent','Accent','--accent'],['today','Today / overdue','--today'],['day','Daily to-do','--day-bg']];
 const mixW=(hex,t)=>'#'+[1,3,5].map(k=>Math.round(255-(255-parseInt(hex.substr(k,2),16))*t).toString(16).padStart(2,'0')).join('');   // blend toward white
 const CLASSIC=[['Ivory',{bg:'#fbf9f2',card:'#fffefb',ink:'#2b2622',accent:'#f7b5cc',today:'#e26d5a'}],['White',{bg:'#ffffff',card:'#fffefb',ink:'#2b2622',accent:'#f7b5cc',today:'#e26d5a'}],
   ['Dark',{bg:'#1d1a17',card:'#26221e',ink:'#f0e9de',accent:'#f7b5cc',today:'#ee7f6c'}]];
