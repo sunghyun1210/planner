@@ -6,6 +6,10 @@
 <title>Planner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Planner">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Hi+Melody&family=Single+Day&family=Gamja+Flower&family=Poor+Story&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;700&family=Playfair+Display:wght@700&family=Dancing+Script:wght@600&family=Caveat:wght@600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -339,20 +343,92 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .toast button{margin-left:12px;text-decoration:underline;font-weight:700}
 
 /* narrow screens: stack */
+/* phone-only pieces are hidden on bigger screens */
+.mnb,.mnav,.mseg,.agenda,.monthday{display:none}
+.mnb{height:28px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:700}
+.mnb.pri{background:var(--accent);border-color:var(--accent);color:#4a2236}
+.mini-grid button.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.week-head>div.sel b{box-shadow:0 0 0 2px var(--accent);border-radius:99px}
+@media (hover:none){.item .x{opacity:.45}}
 @media (max-width:900px){
   body{overflow:auto}
   .app{height:auto;grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"head" "mini" "mtodo" "week" "wtodo"}
   .week{height:75vh}.mini{min-height:300px}.wtodo{min-height:260px}
   #monthList{max-height:220px}
 }
+/* ===== phone layout: one screen per bottom tab (Today / Week / To-do / Month) ===== */
+@media (max-width:700px){
+  body{overflow:hidden}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:8px 10px calc(72px + env(safe-area-inset-bottom));gap:8px}
+  body[data-mtab="today"] .app>:not([data-m~="today"]),body[data-mtab="week"] .app>:not([data-m~="week"]),
+  body[data-mtab="todo"] .app>:not([data-m~="todo"]),body[data-mtab="month"] .app>:not([data-m~="month"]){display:none}
+  body[data-todo="week"] #mtodo,body[data-todo="month"] #wtodo{display:none}
+  /* Today */
+  .head{flex:none;flex-direction:row;justify-content:space-between;align-items:flex-start;padding:2px 4px 0;gap:8px}
+  .head .months{display:none}
+  .bigdate{font-size:30px}
+  .subline{flex-wrap:wrap;gap:6px}
+  .todaybtn,.mnb{display:inline-block;height:32px}
+  .tools{justify-content:flex-end;margin-top:2px}
+  #exp,#imp{display:none}   /* Backup / Restore live in Settings > Data on the phone */
+  .subline{flex-wrap:nowrap}
+  .mnb{padding:0 12px;white-space:nowrap}
+  #mprev,#mnext{width:34px;padding:0}
+  .week{flex:1;min-height:0}
+  .week.dayonly .week-head{grid-template-columns:repeat(7,1fr)}
+  .week.dayonly .week-head>div:first-child,.week.dayonly .wnav{display:none}
+  .week.dayonly .week-head>div{border-left:0;padding:6px 0 4px;font-size:13px}
+  .week.dayonly .week-body,.week.dayonly .daystrip{grid-template-columns:44px 1fr}
+  .daystrip{max-height:calc(var(--hh) * 5)}
+  .dcell .item{min-height:40px}
+  .dcell .item .chk{width:22px;height:22px}
+  .tcol div{padding-right:6px}
+  /* Week (agenda) */
+  .agenda{display:block;flex:1;min-height:0;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 14px 12px}
+  .ahead{display:flex;justify-content:space-between;align-items:center;font-size:24px;font-weight:700;padding:4px 0}
+  .ahead span{display:flex;gap:6px}.ahead button{width:40px;height:34px;border-radius:99px;border:1px solid var(--line);font-size:20px}
+  .aday{border-top:1px solid var(--line);padding:6px 0 4px}
+  .aday h5{display:flex;align-items:center;gap:8px;font-size:17px;margin:2px 0 4px;cursor:pointer}
+  .aday h5 em{font-style:normal;padding:1px 12px;border-radius:99px}
+  .aday.today h5 em{background:var(--accent);color:#4a2236}
+  .aday h5 small{color:var(--muted);font-size:13px;font-weight:400}
+  .aday.sun h5 em{color:var(--sun)}.aday.sat h5 em{color:var(--sat)}.aday.today h5 em{color:#4a2236}
+  .aev,.monthday .aev{display:block;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 40%,var(--card));border-radius:10px;padding:5px 10px;margin:4px 0;font-size:17px;font-weight:700}
+  .aev span{margin-left:8px;color:var(--muted);font-weight:400;font-size:13px}
+  .alist,.monthday .dlist{list-style:none;padding:0}
+  .aday .none{color:var(--muted);opacity:.6;font-size:15px;padding:2px 0}
+  /* To-do */
+  .mseg{display:flex;flex:none;gap:8px}
+  .mseg button{flex:1;padding:8px 0;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:18px;font-weight:700;color:var(--muted)}
+  .mseg button.on{background:var(--accent);border-color:var(--accent);color:#4a2236}
+  .todo{flex:1;min-height:0}
+  .item{min-height:44px}.item .chk{width:24px;height:24px}
+  #monthList{display:block}
+  /* Month */
+  .mini{flex:none}
+  .mini-grid{min-height:300px}
+  .monthday{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;padding:10px 14px}
+  .monthday h4{display:flex;justify-content:space-between;align-items:center;font-size:20px;margin-bottom:4px}
+  /* bottom tab bar */
+  .mnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;justify-content:space-around;align-items:center;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
+  .mnav button{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--muted)}
+  .mnav button b{display:block;font-size:22px;line-height:1.15;margin:0 auto;width:62px;border-radius:14px}
+  .mnav button.on{color:var(--ink)}.mnav button.on b{background:var(--accent);color:#4a2236}
+  /* sheets and popups */
+  dialog{margin:auto 0 0;width:100%;max-width:100%;max-height:92dvh;border-radius:24px 24px 0 0}
+  .settings{left:8px;right:8px;width:auto;top:8px;bottom:8px}
+  .toast{bottom:92px}
+  .ac{max-width:calc(100vw - 20px)}
+}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="head">
+  <header class="head" data-m="today">
     <div>
       <button class="bigdate" id="bigdate" title="Go to today"></button>
-      <div class="subline"><span id="dow"></span><button id="todayBtn" class="todaybtn" title="Back to today">Today</button></div>
+      <div class="subline"><span id="dow"></span><button id="todayBtn" class="todaybtn" title="Back to today">Today</button><button class="mnb" id="mprev" aria-label="Previous week">‹</button><button class="mnb" id="mnext" aria-label="Next week">›</button><button class="mnb pri" id="mAddEv">+ Event</button></div>
     </div>
     <div>
       <div class="months" id="months"></div>
@@ -360,7 +436,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
     </div>
   </header>
 
-  <section class="card todo" style="grid-area:mtodo">
+  <section class="card todo" id="mtodo" data-m="todo" style="grid-area:mtodo">
     <div class="trow">
       <h2>Monthly To-do</h2>
       <form class="add" id="mAdd"><input placeholder="Add a monthly to-do…" autocomplete="off"><button aria-label="Add">+</button></form>
@@ -372,18 +448,21 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
     <div class="donebox" id="mDone" hidden></div>
   </section>
 
-  <section class="card mini">
+  <section class="card mini" data-m="month">
     <div class="mini-head"><button id="prev" aria-label="Previous month">‹</button><b id="miniTitle"></b><button id="next" aria-label="Next month">›</button></div>
     <div class="mini-grid" id="miniGrid"></div>
   </section>
 
-  <section class="card week" id="week">
+  <div class="mseg" id="mseg" data-m="todo"><button data-s="week" class="on">Weekly</button><button data-s="month">Monthly</button></div>
+  <div class="agenda" id="agenda" data-m="week"></div>
+  <section class="card monthday" id="monthDay" data-m="month"></section>
+  <section class="card week" id="week" data-m="today">
     <div class="week-head" id="weekHead"></div>
     <div class="daystrip" id="dayStrip" hidden></div>
     <div class="week-body" id="weekBody"></div>
   </section>
 
-  <section class="card todo wtodo">
+  <section class="card todo wtodo" id="wtodo" data-m="todo">
     <h2>Weekly To-do <span><button class="tsort" data-s="week" title="Group by tag · drag tags to set the order">#</button><button class="ddone" data-d="week" title="Show completed">✓</button></span></h2>
     <form class="add" id="wAdd"><input placeholder="Add a weekly to-do…" autocomplete="off"><button aria-label="Add">+</button></form>
     <div class="tagbar" id="wBar" hidden></div>
@@ -391,6 +470,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
     <div class="donebox" id="wDone" hidden></div>
   </section>
 </div>
+<nav class="mnav" id="mnav"><button data-t="today" class="on"><b>◉</b>Today</button><button data-t="week"><b>▦</b>Week</button><button data-t="todo"><b>☑</b>To-do</button><button data-t="month"><b>▤</b>Month</button></nav>
 
 <dialog id="dlg">
   <div class="dlg-bar"></div>
@@ -432,7 +512,15 @@ const normSettings=()=>{const o=db.settings=db.settings||{};o.sizes=o.sizes||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
 
 const today=new Date();
-const view={y:today.getFullYear(),m:today.getMonth(),ws:wkStart(today)};
+const view={y:today.getFullYear(),m:today.getMonth(),ws:wkStart(today),sel:null};
+const isMobile=()=>matchMedia('(max-width:700px)').matches;
+let mTab='today',todoSeg='week';
+// the selected day (phone): always inside the week being shown
+function selDate(){
+  const a=iso(view.ws),b=iso(addDays(view.ws,6));
+  if(!view.sel||view.sel<a||view.sel>b){const t=iso(today);view.sel=t>=a&&t<=b?t:a}
+  return view.sel;
+}
 
 /* ---- navigation ---- */
 function gotoMonth(y,m){
@@ -466,7 +554,7 @@ function renderMini(){
   let h=DOW.map((d,i)=>`<div class="dow ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
   for(let i=0;i<weeks*7;i++){
     const d=addDays(start,i), s=iso(d);
-    const cls=[d.getDay()===0?'sun':d.getDay()===6?'sat':'',d.getMonth()!==view.m?'out':'',s>=wsISO&&s<=weISO?'inweek':'',s===tISO?'today':'',evDays.has(s)?'has':''].join(' ');
+    const cls=[d.getDay()===0?'sun':d.getDay()===6?'sat':'',d.getMonth()!==view.m?'out':'',s>=wsISO&&s<=weISO?'inweek':'',s===tISO?'today':'',s===view.sel?'sel':'',evDays.has(s)?'has':''].join(' ');
     h+=`<button class="${cls}" data-d="${s}">${d.getDate()}</button>`;
   }
   $('#miniGrid').style.gridTemplateRows=`auto repeat(${weeks},1fr)`;
@@ -478,13 +566,13 @@ $('#miniGrid').onclick=e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset.d,now=Date.now(),dbl=d===lastMini.d&&now-lastMini.t<400;
   lastMini={d,t:dbl?0:now};
-  if(dbl)openDlg(null,{date:d,start:'06:00',end:'07:00'});else gotoDate(parse(d));
+  if(dbl&&!isMobile())openDlg(null,{date:d,start:'06:00',end:'07:00'});else{view.sel=d;gotoDate(parse(d))}
 };
 
 /* ---- weekly calendar ---- */
 function setHourHeight(){
   const body=$('#weekBody'), old=hourH();
-  const strip=$('#dayStrip'),hh=Math.max(22,(body.clientHeight+(strip.hidden?0:strip.offsetHeight))/(db.settings.hours||10));  // 10 hours visible by default
+  const strip=$('#dayStrip'),hh=isMobile()?48:Math.max(22,(body.clientHeight+(strip.hidden?0:strip.offsetHeight))/(db.settings.hours||10));  // 10 hours visible by default
   $('#week').style.setProperty('--hh',hh+'px');
   body.scrollTop=body.scrollTop/old*hh;        // keep the same top hour on resize
 }
@@ -502,13 +590,14 @@ function layout(list){
 const fmt=h=>h>=24?'23:59':`${pad(Math.floor(h))}:${pad(Math.round((h%1)*60))}`;
 function renderWeek(){
   const body=$('#weekBody'), keep=body.scrollTop, tISO=iso(today);
-  const days=[...Array(7)].map((_,i)=>addDays(view.ws,i));
+  const days=[...Array(7)].map((_,i)=>addDays(view.ws,i)),sel=selDate(),dayOnly=isMobile()&&mTab==='today';
+  $('#week').classList.toggle('dayonly',dayOnly);
   $('#weekHead').innerHTML='<div><button class="wnav" data-n="-1" aria-label="Previous week">‹</button></div>'
-    +days.map(d=>`<div class="${iso(d)===tISO?'today':''} ${d.getDay()===0?'sun':d.getDay()===6?'sat':''}">${DOW[d.getDay()]}<b>${d.getDate()}</b></div>`).join('')
+    +days.map(d=>`<div data-d="${iso(d)}" class="${iso(d)===tISO?'today':''} ${iso(d)===sel?'sel':''} ${d.getDay()===0?'sun':d.getDay()===6?'sat':''}">${DOW[d.getDay()]}<b>${d.getDate()}</b></div>`).join('')
     +'<button class="wnav r" data-n="1" aria-label="Next week">›</button>';
   let h='<div class="tcol">'+[...Array(24)].map((_,i)=>`<div>${pad(i)}:00</div>`).join('')+'</div>';
   const nowH=today.getHours()+today.getMinutes()/60;
-  days.forEach(d=>{
+  (dayOnly?days.filter(d=>iso(d)===sel):days).forEach(d=>{
     const s=iso(d);
     const evs=layout(db.events.filter(e=>e.date===s).map(ev=>{const st=toH(ev.start);return{ev,s:st,e:Math.max(toH(ev.end),st+.25)}}));
     h+=`<div class="day ${s===tISO?'today':''}" data-d="${s}">`+[...Array(24)].map((_,i)=>`<div class="slot" data-h="${i}"></div>`).join('')
@@ -521,10 +610,13 @@ function renderWeek(){
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 $('#weekHead').onclick=e=>{
   const b=e.target.closest('.wnav'),c=e.target.closest('.week-head>div');
+  if(isMobile()&&c&&!b){view.sel=c.dataset.d;renderAll(true);return}   // phone: tap a date to pick the day
   if(b)gotoDate(addDays(view.ws,7*b.dataset.n));
   else if(c&&c!==$('#weekHead').firstElementChild){db.dayOpen=!db.dayOpen;save();renderDays()}   // click any date: show / hide the week's daily to-dos
 };
 $('#weekBody').onclick=e=>{
+  const evEl=e.target.closest('.ev');
+  if(evEl&&isMobile()){openDlg(db.events.find(x=>x.id===evEl.dataset.id));return}   // phone: tap an event to edit
   const slot=e.target.closest('.slot');
   if(slot){const date=slot.parentNode.dataset.d,h=+slot.dataset.h;
     openDlg(null,{date,start:`${pad(h)}:00`,end:`${pad(Math.min(h+1,23))}:${h>=23?'59':'00'}`})}
@@ -537,7 +629,7 @@ $('#weekBody').ondblclick=e=>{
 /* drag to move / resize events (15-min snap) */
 let drag=null;
 $('#weekBody').addEventListener('pointerdown',e=>{
-  const el=e.target.closest('.ev');if(!el||e.button)return;
+  const el=e.target.closest('.ev');if(!el||e.button||isMobile())return;   // no drag on the phone: use the edit sheet
   const ev=db.events.find(x=>x.id===el.dataset.id);if(!ev)return;
   const cols=[...document.querySelectorAll('#weekBody .day')];
   drag={el,ev,id:e.pointerId,x0:e.clientX,y0:e.clientY,hh:hourH(),cols,moved:false,
@@ -740,7 +832,7 @@ const monthKeyNow=()=>mKey(view.y,view.m), weekKeyNow=()=>iso(view.ws);
 function renderTodos(){
   renderList(mList,'month',monthKeyNow());
   renderList(wList,'week',weekKeyNow());
-  renderTagBars();renderDays();
+  renderTagBars();renderDays();renderAgenda();renderMonthDay();
   renderDone($('#mDone'),'month',monthKeyNow());renderDone($('#wDone'),'week',weekKeyNow());
 }
 /* tag-order bar: shown while "#sort" is on; drag the tags to change the order (shared by both lists) */
@@ -789,8 +881,8 @@ document.querySelectorAll('.ddone').forEach(b=>b.onclick=()=>{db.showDone[b.data
 /* daily to-dos: one column per day under the date header, toggled by clicking a date */
 let dayFocus=null;
 function renderDays(){
-  const st=$('#dayStrip');st.hidden=!db.dayOpen;if(!db.dayOpen)return;
-  const tISO=iso(today),days=[...Array(7)].map((_,i)=>addDays(view.ws,i));
+  const st=$('#dayStrip'),dayOnly=isMobile()&&mTab==='today';st.hidden=!(db.dayOpen||dayOnly);if(st.hidden)return;
+  const tISO=iso(today),week=[...Array(7)].map((_,i)=>addDays(view.ws,i)),days=dayOnly?week.filter(d=>iso(d)===selDate()):week;
   st.innerHTML=`<div class="dtool"><button class="ddone${db.showDone.day?' on':''}" data-d="day" title="Show completed">✓</button></div>`+days.map(d=>{
     const k=iso(d),items=db.todos.filter(t=>!t.done&&t.scope==='day'&&t.key===k).sort((a,b)=>a.order-b.order);
     return `<div class="dcell ${k===tISO?'today':''}" data-d="${k}"><ul class="dlist" data-scope="day" data-key="${k}">`
@@ -850,7 +942,11 @@ function listEvents(el){
     toast('Deleted',()=>{db.todos.push(t);if(ev)db.events.push(ev);save();renderAll(true)});
   });
   el.addEventListener('dblclick',e=>{
-    const li=e.target.closest('.item');if(!li||e.target.closest('.chk,.x,.edit'))return;
+    const li=e.target.closest('.item');if(!li||e.target.closest('.chk,.x,.edit'))return;startEdit(li)});
+  el.addEventListener('click',e=>{   // phone: a single tap on the text edits it
+    if(!isMobile()||!e.target.closest('.t'))return;
+    const li=e.target.closest('.item');if(li.classList.contains('done')||li.classList.contains('editing'))return;startEdit(li)});
+  function startEdit(li){
     const s=li.querySelector('.t');
     const t=db.todos.find(x=>x.id===li.dataset.id),inp=document.createElement('textarea');
     inp.className='edit';inp.rows=1;inp.value=withTokens(t);s.replaceWith(inp);li.classList.add('editing');attachAC(inp);const fit=()=>{inp.style.height='auto';inp.style.height=inp.scrollHeight+'px'};inp.addEventListener('input',fit);fit();inp.focus();inp.select();
@@ -859,7 +955,7 @@ function listEvents(el){
       if(ok&&p.title){rememberTags(p.tags);Object.assign(t,{title:p.title,tags:p.tags,due:p.due,dueTime:p.time});syncDueEvent(t);save()}renderAll(true)};
     inp.onkeydown=ev=>{if(ev.key==='Enter'){ev.preventDefault();finish(true)}else if(ev.key==='Escape')finish(false)};
     inp.onblur=()=>finish(true);
-  });
+  }
 }
 [mList,wList,$('#dayStrip')].forEach(listEvents);
 
@@ -1070,6 +1166,58 @@ cpop.addEventListener('change',e=>{
 addEventListener('keydown',e=>{if(e.key==='Escape')cpop.hidden=true});
 $('#weekList').addEventListener('scroll',()=>cpop.hidden=true);
 
+/* ---- phone screens: Week (agenda), Month (day list), tabs ---- */
+const DAYN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const todoLi=(t,late)=>`<li class="item${late?' overdue':''}" data-id="${t.id}"><input type="checkbox" class="chk" aria-label="Complete"><span class="t">${esc(t.title)}</span><span class="sp"></span>${(t.tags||[]).map(g=>`<span class="pill" style="--c:${tagColor(g)}">${esc(g)}</span>`).join('')}<button class="x" aria-label="Delete">×</button></li>`;
+const evCard=e=>`<div class="aev" data-id="${e.id}" style="--c:${e.color}"><b>${esc(e.title)}</b><span>${e.start}–${e.end}</span></div>`;
+const dayEvents=k=>db.events.filter(e=>e.date===k).sort((a,b)=>a.start<b.start?-1:1);
+const dayTodos=k=>db.todos.filter(t=>!t.done&&t.scope==='day'&&t.key===k).sort((a,b)=>a.order-b.order);
+function renderAgenda(){
+  const box=$('#agenda');if(!isMobile()){box.innerHTML='';return}
+  const tISO=iso(today),we=addDays(view.ws,6);selDate();
+  box.innerHTML=`<div class="ahead"><span style="gap:0">${MON[view.ws.getMonth()]} ${view.ws.getDate()} – ${view.ws.getMonth()!==we.getMonth()?MON[we.getMonth()]+' ':''}${we.getDate()}</span><span><button id="aPrev" aria-label="Previous week">‹</button><button id="aNext" aria-label="Next week">›</button></span></div>`
+    +[...Array(7)].map((_,i)=>{
+      const d=addDays(view.ws,i),k=iso(d),ev=dayEvents(k),td=dayTodos(k);
+      return `<section class="aday ${k===tISO?'today':''} ${d.getDay()===0?'sun':d.getDay()===6?'sat':''}" data-d="${k}"><h5 data-go="${k}"><em>${DAYN[d.getDay()]} ${d.getDate()}</em><small>${ev.length+td.length?`${ev.length} events · ${td.length} tasks`:'nothing yet'}</small></h5>`
+        +ev.map(evCard).join('')+(td.length?`<ul class="alist" data-scope="day" data-key="${k}">${td.map(t=>todoLi(t,k<tISO)).join('')}</ul>`:'')+'</section>';
+    }).join('');
+}
+$('#agenda').addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]'),ev=e.target.closest('.aev');
+  if(e.target.closest('#aPrev,#aNext')){const n=e.target.closest('#aPrev')?-7:7;view.sel=iso(addDays(parse(selDate()),n));gotoDate(addDays(view.ws,n));return}
+  if(ev)return openDlg(db.events.find(x=>x.id===ev.dataset.id));
+  if(go){view.sel=go.dataset.go;setTab('today')}
+});
+listEvents($('#agenda'));
+function renderMonthDay(){
+  const box=$('#monthDay');if(!isMobile()){box.innerHTML='';return}
+  const k=selDate(),d=parse(k),tISO=iso(today);
+  box.innerHTML=`<h4><span>${DAYN[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}</span><button class="mnb pri" id="mdAdd">+ Event</button></h4>`
+    +dayEvents(k).map(evCard).join('')
+    +`<div class="dcell" data-d="${k}" style="border:0;padding:0"><ul class="dlist" data-scope="day" data-key="${k}">${dayTodos(k).map(t=>todoLi(t,k<tISO)).join('')}<li class="dadd"><span class="fchk"></span><input placeholder="Add task" autocomplete="off" aria-label="Add task"></li></ul></div>`;
+  box.querySelectorAll('.dadd input').forEach(attachAC);
+}
+$('#monthDay').addEventListener('click',e=>{
+  if(e.target.closest('#mdAdd'))return openDlg(null,{date:selDate(),start:'09:00',end:'10:00'});
+  const ev=e.target.closest('.aev');if(ev)openDlg(db.events.find(x=>x.id===ev.dataset.id));
+});
+$('#monthDay').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.matches('.dadd input'))addDayTodo(e.target.closest('.dcell').dataset.d,e.target.value);
+});
+listEvents($('#monthDay'));
+function setTab(t){
+  mTab=t;document.body.dataset.mtab=t;
+  document.querySelectorAll('#mnav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  renderAll(true);
+  if(t==='today')requestAnimationFrame(()=>{setHourHeight();scrollToDefault()});
+}
+$('#mnav').onclick=e=>{const b=e.target.closest('button');if(b)setTab(b.dataset.t)};
+$('#mseg').onclick=e=>{const b=e.target.closest('button');if(!b)return;todoSeg=b.dataset.s;document.body.dataset.todo=todoSeg;
+  document.querySelectorAll('#mseg button').forEach(x=>x.classList.toggle('on',x===b))};
+const shiftWeek=n=>{view.sel=iso(addDays(parse(selDate()),n));gotoDate(addDays(view.ws,n))};
+$('#mprev').onclick=()=>shiftWeek(-7);$('#mnext').onclick=()=>shiftWeek(7);
+$('#mAddEv').onclick=()=>openDlg(null,{date:selDate(),start:'09:00',end:'10:00'});
+
 /* ---- main ---- */
 // unfinished weekly todos from past weeks roll forward to the current week
 function carryOver(){
@@ -1080,7 +1228,9 @@ function carryOver(){
 function renderAll(keepScroll){renderHead();renderMini();renderWeek();renderTodos()}
 carryOver();
 applySettings();
+document.body.dataset.mtab=mTab;document.body.dataset.todo=todoSeg;
 renderAll();
+matchMedia('(max-width:700px)').addEventListener('change',()=>{renderAll(true);setHourHeight();scrollToDefault()});
 loadUploadedFonts();
 const initView=()=>{setHourHeight();scrollToDefault()};
 initView();addEventListener('load',()=>requestAnimationFrame(initView));
