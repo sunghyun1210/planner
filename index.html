@@ -19,7 +19,7 @@
   --bg:#ffffff; --card:#fffefb; --ink:#2b2622; --muted:#8a8177; --line:#ece6d9;
   --accent:#f7b5cc; --accent-soft:#fdeaf1; --today:#e26d5a;
   --font:"Gaegu"; --font-head:var(--font);
-  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --accent-ink:#4a2236; --day-bg:#fcf9f9; --day-ink:#2b2622; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
+  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --accent-ink:#4a2236; --sun:#e5534b; --sat:#4fa3e0; --accent-text:color-mix(in srgb,var(--accent) 55%,#5a2a3a); --day-bg:#fcf9f9; --day-ink:#2b2622; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -27,6 +27,7 @@
     --accent:#f7b5cc; --accent-soft:#3d2630; --today:#ee7f6c; --shadow:0 1px 2px rgba(0,0,0,.3);
   }
 }
+@supports (color:oklch(from red l c h)){:root{--accent-text:oklch(from var(--accent) .56 calc(c * 1.6) h)}}   /* the highlight colour, deepened so it reads as text */
 *{box-sizing:border-box;margin:0}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:var(--fs-base)/1.4 var(--font),"Gamja Flower",system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;overflow:hidden}
@@ -48,7 +49,7 @@ input{font:inherit;color:inherit}
 .months{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .months button{padding:8px 0;border-radius:10px;font-size:var(--fs-head);color:var(--muted);border:1px solid transparent;transition:.15s}
 .months button:hover{background:var(--accent-soft);color:var(--ink)}
-.months button.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.months button.on{background:none;color:var(--accent-text);font-weight:800}
 .tools{display:flex;gap:10px;align-items:center;font-size:calc(var(--fs-head) - 1px);color:var(--muted);margin-top:8px}
 .tools button{text-decoration:underline;text-underline-offset:2px;color:var(--muted)}
 
@@ -59,7 +60,7 @@ input{font:inherit;color:inherit}
 .add{display:flex;gap:6px;margin:8px 0 6px}
 .add input{font-size:var(--fs-item);flex:1;min-width:0;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:transparent;outline:none}
 .add input:focus{border-color:var(--accent)}
-.add button{width:34px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:18px;line-height:1}
+.add button{width:34px;border-radius:10px;background:none;color:var(--accent-text);font-weight:800;font-size:28px;line-height:1}
 .list{list-style:none;padding:0;flex:1;min-height:40px;overflow-y:auto;scrollbar-width:none;align-content:start}
 .list::-webkit-scrollbar{display:none}
 .list:empty::before{content:"All done ✓";display:block;color:var(--muted);font-size:13px;padding:8px 2px}
@@ -360,7 +361,8 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .bwk{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:17px;font-weight:700}
 .bwk button{width:30px;height:30px;border-radius:50%;font-size:22px;color:var(--muted)}
 .bwk button:hover{background:var(--accent-soft);color:var(--ink)}
-#bThis{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:8px 18px;font-weight:700;font-size:17px}
+#bThis{background:none;border:1px solid var(--line);color:var(--accent-text);border-radius:14px;padding:8px 18px;font-weight:800;font-size:17px}
+#bThis:hover{background:var(--accent-soft)}
 .bsub{color:var(--muted);font-size:15px;margin:4px 0 0}
 .bhint{display:block;font-size:13px;opacity:.85}
 .bdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:1fr;gap:8px;margin-top:16px;flex:1 1 0}   /* the cards stretch so the board has no empty space */
@@ -369,6 +371,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .bday.tdy{background:color-mix(in srgb,var(--accent) 16%,var(--day-bg))}
 .bday .dn{text-align:center;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:6px;letter-spacing:.05em}
 .bday .dn b{display:block;font-size:26px;font-weight:700;color:var(--ink);line-height:1.1}
+.bday.tdy .dn,.bday.tdy .dn b{color:var(--accent-text)}   /* today = theme colour (Sun / Sat keep red / blue below) */
 .bday.sun .dn,.bday.sun .dn b{color:var(--sun)}.bday.sat .dn,.bday.sat .dn b{color:var(--sat)}
 .blist{list-style:none;padding:0;min-height:36px}
 .bday .item,.bcat .item{font-size:var(--fs-day);min-height:30px;padding:3px 2px;gap:8px;align-items:flex-start}
@@ -521,9 +524,8 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
   <div class="agenda" id="agenda"></div>
   <section class="card monthday" id="monthDay" data-m="month"></section>
   <section class="card board" id="board" data-m="week" style="grid-area:week">
-    <div class="bh"><h1>Weekly Task Board</h1>
+    <div class="bh"><h1 title="Drag to move a task to any list · Ctrl (Option on Mac) + drag to copy">Weekly Task Board</h1>
       <div class="bnav"><div class="bwk"><button id="bPrev" aria-label="Previous week">‹</button><span id="bRange"></span><button id="bNext" aria-label="Next week">›</button></div><button id="bThis">This Week</button></div></div>
-    <p class="bsub">이번 주 할 일을 요일별로 정리하고, 날짜가 정해지지 않은 일도 함께 관리해요. <span class="bhint">항목은 끌어서 어느 목록으로든 옮길 수 있고, Ctrl(맥은 Option)을 누른 채 끌면 복사돼요.</span></p>
     <div class="bdays" id="bdays"></div>
     <div class="bcats" id="bcats"></div>
   </section>
