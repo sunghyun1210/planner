@@ -523,7 +523,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
   <section class="card board" id="board" data-m="week" style="grid-area:week">
     <div class="bh"><h1>Weekly Task Board</h1>
       <div class="bnav"><div class="bwk"><button id="bPrev" aria-label="Previous week">‹</button><span id="bRange"></span><button id="bNext" aria-label="Next week">›</button></div><button id="bThis">This Week</button></div></div>
-    <p class="bsub">이번 주 할 일을 요일별로 정리하고, 날짜가 정해지지 않은 일도 함께 관리해요. <span class="bhint">항목을 Ctrl(맥은 Option)을 누른 채 끌면 다른 목록(Monthly · Weekly · 보드)으로 복사돼요.</span></p>
+    <p class="bsub">이번 주 할 일을 요일별로 정리하고, 날짜가 정해지지 않은 일도 함께 관리해요. <span class="bhint">항목은 끌어서 어느 목록으로든 옮길 수 있고, Ctrl(맥은 Option)을 누른 채 끌면 복사돼요.</span></p>
     <div class="bdays" id="bdays"></div>
     <div class="bcats" id="bcats"></div>
   </section>
@@ -1044,11 +1044,10 @@ const syncList=el=>[...el.children].forEach((li,i)=>{
   const t=db.todos.find(x=>x.id===li.dataset.id);if(t){if(t.key!==el.dataset.key||t.scope!==el.dataset.scope)delete t.origin;   // moved on purpose: no longer overdue
   t.scope=el.dataset.scope;t.key=el.dataset.key;if(el.dataset.cat)t.cat=el.dataset.cat;else delete t.cat;t.order=i}
 });
-const secOf=s=>s.el.dataset.sec,copyKey=e=>!!(e&&(e.ctrlKey||e.altKey));   // strictly true/false: Sortable treats undefined as "allow"
-const copyGroup={name:'todos',
-  pull:(to,from,el,evt)=>secOf(to)===secOf(from)?true:(copyKey(evt)?'clone':false),   // other section: only as a copy
-  put:(to,from,el,evt)=>secOf(to)===secOf(from)||copyKey(evt)};
-function copyTodo(e){   // Ctrl + drag into another section: the original stays, a copy lands where it was dropped
+const copyKey=e=>!!(e&&(e.ctrlKey||e.altKey));   // strictly true/false: Sortable treats undefined as "allow"
+// a plain drag moves a task to any list; Ctrl (Option on Mac) + drag copies it instead
+const copyGroup={name:'todos',pull:(to,from,el,evt)=>copyKey(evt)?'clone':true,put:true};
+function copyTodo(e){   // Ctrl + drag: the original stays, a copy lands where it was dropped
   const src=db.todos.find(x=>x.id===e.item.dataset.id);
   e.item.remove();
   if(!src){renderTodos();return}
