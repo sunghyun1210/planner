@@ -195,10 +195,6 @@ input{font:inherit;color:inherit}
 .item .chk{margin-top:4px}
 .item .pill{margin-top:3px}
 .item .x{margin-top:2px}
-.item.overdue .t{color:var(--today)}
-.item.overdue .chk{border-color:var(--today)}
-body.no-overdue .item.overdue .t{color:inherit}
-body.no-overdue .item.overdue .chk{border-color:var(--muted)}   /* Settings > Board: red marking switched off */
 .item .sp{flex:1}
 .item .pill{flex:none;font-size:var(--fs-pill);font-weight:700;line-height:1;padding:4px 10px;border-radius:99px;white-space:nowrap;
   background:color-mix(in srgb,var(--c) 60%,var(--card));color:color-mix(in srgb,var(--c) 22%,var(--ink))}
@@ -1101,7 +1097,7 @@ const SIZES=[['base','Base text','--fs-base',12,26,17],['bigdate','Big date','--
   ['title','Card titles','--fs-title',16,44,28],['item','Item text','--fs-item',12,36,22],['pill','Tag chips','--fs-pill',10,24,15],
   ['btitle','Board title','--fs-btitle',16,60,34],['day','Day card text','--fs-day',10,28,16],['cat','Category title','--fs-cat',12,44,25],
   ['mini','Mini calendar','--fs-mini',10,22,12.5]];
-const COLS=[['bg','Page background','--bg'],['card','Card background','--card'],['ink','Text','--ink'],['accent','Highlight','--accent'],['today','Overdue / alert','--today'],['sun','Sunday','--sun'],['sat','Saturday','--sat'],
+const COLS=[['bg','Page background','--bg'],['card','Card background','--card'],['ink','Text','--ink'],['accent','Highlight','--accent'],['today','Alert (delete buttons)','--today'],['sun','Sunday','--sun'],['sat','Saturday','--sat'],
   ['headInk','Header text','--head-ink'],['listBg','To-do cards background','--list-bg'],['listInk','To-do cards text','--list-ink'],
   ['boardBg','Board background','--board-bg'],['boardInk','Board text','--board-ink'],['day','Day card background','--day-bg'],['dayInk','Day card text','--day-ink'],['catInk','Category card text','--cat-ink'],
   ['miniBg','Calendar background','--mini-bg'],['miniInk','Calendar text','--mini-ink']];
@@ -1158,7 +1154,6 @@ function applySettings(){
   set('--accent-soft',(c.accent||c.card)&&'color-mix(in srgb,var(--accent) 18%,var(--card))');
   set('--accent-ink',c.accent&&'color-mix(in srgb,var(--accent) 30%,#241a1e)');   // readable text on the highlight colour
   const m=document.querySelector('meta[name=theme-color]');if(m)m.content=c.bg||'#ffffff';
-  document.body.classList.toggle('no-overdue',st.overdue===false);
   setHourHeight();
 }
 const scaleFactor=p=>{p=p==null?50:p;return p<=50?.7+.3*p/50:1+.5*(p-50)/50};   // 0 -> 70%, 50 -> 100% (current), 100 -> 150%
@@ -1199,9 +1194,7 @@ function buildSettings(){
       <p class="hint">Cards under the day cards for tasks without a date.</p>
       <div id="catList">${db.categories.map(c=>`<div class="catrow" data-id="${c.id}"><span class="grab" title="Drag to reorder">⋮⋮</span><input class="ci" value="${esc(c.icon||'')}" maxlength="4" aria-label="Icon"><input class="cn" value="${esc(c.name)}" aria-label="Name"><input class="cc" type="color" value="${c.color}" aria-label="Colour"><button class="cd" aria-label="Delete category">×</button><input class="cs" value="${esc(c.desc||'')}" placeholder="Description" aria-label="Description"></div>`).join('')}</div>
       <button type="button" class="dbtn" id="catAdd"><b>+ Add category</b></button>
-      <h4>Unfinished tasks</h4>
-      <label class="chkrow"><input type="checkbox" id="odOn" ${st.overdue===false?'':'checked'}> Show unfinished tasks from past days in red</label>
-      <p class="hint">The red comes from Colours → Overdue / alert. Day-card and category colours and sizes are in the Colours and Sizes tabs.</p>`,
+      <p class="hint">Day-card and category colours and sizes are in the Colours and Sizes tabs.</p>`,
     data:`<h4>Your data</h4>
       <button type="button" class="dbtn" id="dBackup"><b>Download backup</b><small>Saves everything (events, to-dos, tags, settings) to a file</small></button>
       <button type="button" class="dbtn" id="dRestore"><b>Restore from backup</b><small>Replaces the current data with a backup file</small></button>
@@ -1230,7 +1223,6 @@ function buildSettings(){
     el.oninput=()=>{st.colors[el.dataset.k]=el.value;applySettings();save()};
     el.onchange=()=>{if(settingsTab==='colours')buildSettings()}});   // show the ↺ once a colour is set
   all('.rst[data-k]').forEach(b=>b.onclick=()=>{delete st.colors[b.dataset.k];applySettings();save();buildSettings()});
-  const od=one('#odOn');if(od)od.onchange=()=>{st.overdue=od.checked;applySettings();save()};
   const cr=one('#cReset');if(cr)cr.onclick=()=>{const a=st.colors.accent;st.colors={};if(a)st.colors.accent=a;applySettings();save();buildSettings()};
   const zr=one('#zReset');if(zr)zr.onclick=()=>{st.sizes={};delete st.textScale;applySettings();save();buildSettings()};
   all('.hl[data-c]').forEach(b=>b.onclick=()=>{st.colors.accent=b.dataset.c;applySettings();save();buildSettings()});
