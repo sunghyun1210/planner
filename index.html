@@ -19,7 +19,7 @@
   --bg:#ffffff; --card:#fffefb; --ink:#2b2622; --muted:#8a8177; --line:#ece6d9;
   --accent:#f7b5cc; --accent-soft:#fdeaf1; --today:#e26d5a;
   --font:"Gaegu"; --font-head:var(--font);
-  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --accent-ink:#4a2236; --sun:#e5534b; --sat:#4fa3e0; --accent-text:color-mix(in srgb,var(--accent) 55%,#5a2a3a); --head-ink:var(--ink); --list-bg:var(--card); --list-ink:var(--ink); --board-bg:var(--card); --board-ink:var(--ink); --cat-ink:#2b2622; --mini-bg:var(--card); --mini-ink:var(--ink); --fs-btitle:34px; --fs-cat:25px; --day-bg:#fcf9f9; --day-ink:#2b2622; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
+  --fs-base:17px; --fs-bigdate:44px; --fs-title:28px; --fs-item:22px; --fs-event:22px; --fs-cal:12px; --fs-mini:12.5px; --fs-head:13px; --fs-pill:15px; --fs-day:16px; --accent-ink:#4a2236; --sun:#e5534b; --sat:#4fa3e0; --accent-text:color-mix(in srgb,var(--accent) 55%,#5a2a3a); --head-ink:var(--ink); --m-bg:var(--card); --m-ink:var(--ink); --w-bg:var(--card); --w-ink:var(--ink); --fs-m-title:28px; --fs-m-item:22px; --fs-m-pill:15px; --fs-w-title:28px; --fs-w-item:22px; --fs-w-pill:15px; --list-bg:var(--card); --list-ink:var(--ink); --board-bg:var(--card); --board-ink:var(--ink); --cat-ink:#2b2622; --mini-bg:var(--card); --mini-ink:var(--ink); --fs-btitle:34px; --fs-bnav:17px; --fs-dname:14px; --fs-dnum:26px; --bnav-ink:var(--board-ink); --bthis-ink:var(--accent-text); --bthis-bg:transparent; --fs-cat:25px; --day-bg:#fcf9f9; --day-ink:#2b2622; --shadow:0 1px 2px rgba(60,40,10,.06),0 4px 14px rgba(60,40,10,.05);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -33,7 +33,7 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font:var(--fs-base)/1.4 var(--font),"Gamja Flower",system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 input{font:inherit;color:inherit}
-.ev,.tcol div,.week-head div,.mini-grid,.tag,.item .t{font-weight:700}
+.ev,.tcol div,.week-head div,.mini-grid,.tag{font-weight:700}
 
 .app{height:100vh;height:100dvh;padding:14px;display:grid;gap:14px;
   grid-template-columns:minmax(260px,300px) 1fr minmax(260px,320px);
@@ -263,6 +263,8 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .settings header button{width:30px;height:30px;border-radius:50%;font-size:20px;color:var(--muted)}
 .settings header button:hover{background:var(--accent-soft);color:var(--ink)}
 .settings .body{flex:1;overflow-y:auto;padding:4px 18px 10px}
+.settings .ssec{border-radius:12px;padding:0 4px;margin:0 -4px;transition:background .15s}
+.settings .ssec:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
 .settings h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
 .settings .row2{display:flex;align-items:center;gap:10px;margin:7px 0}
 .settings .chkrow{display:flex;gap:10px;align-items:center;margin:6px 0;font-size:15px;cursor:pointer}
@@ -270,7 +272,7 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .settings .rst{flex:none;width:26px;height:26px;border-radius:50%;color:var(--muted);font-size:16px}
 .settings .rst:hover{background:var(--accent-soft);color:var(--ink)}
 .settings .rst0{flex:none;width:26px}
-.settings .row2 label{flex:0 0 118px;font-size:14px}
+.settings .row2 label{flex:0 0 108px;font-size:14px}
 .settings .row2 output{flex:0 0 34px;text-align:right;font-size:13px;color:var(--muted)}
 .settings input[type=range]{flex:1;min-width:0;accent-color:var(--accent)}
 .settings input[type=color]{width:40px;height:28px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
@@ -357,19 +359,23 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .week-head>div.sel b{box-shadow:0 0 0 2px var(--accent);border-radius:99px}
 /* ---- per-area colours (Settings > Colours) ---- */
 .head{color:var(--head-ink);--ink:var(--head-ink)}
-.card.todo{background:var(--list-bg);color:var(--list-ink);--ink:var(--list-ink)}
+#mtodo{background:var(--m-bg);color:var(--m-ink);--ink:var(--m-ink);--fs-title:var(--fs-m-title);--fs-item:var(--fs-m-item);--fs-pill:var(--fs-m-pill)}
+#wtodo{background:var(--w-bg);color:var(--w-ink);--ink:var(--w-ink);--fs-title:var(--fs-w-title);--fs-item:var(--fs-w-item);--fs-pill:var(--fs-w-pill)}
 .card.board{background:var(--board-bg);color:var(--board-ink);--ink:var(--board-ink)}
 .card.mini{background:var(--mini-bg);color:var(--mini-ink);--ink:var(--mini-ink)}
+/* settings panel: on a wide screen the page makes room instead of being covered */
+@media (min-width:1100px){.app{transition:margin-right .2s}body.sopen .app{margin-right:364px}}
+.flash{outline:3px solid var(--accent-text);outline-offset:2px;border-radius:18px}
 /* ---- Weekly Task Board ---- */
 .board{padding:20px 26px;overflow-y:auto;scrollbar-width:none;min-height:0;display:flex;flex-direction:column}
 .board::-webkit-scrollbar{display:none}
 .bh{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .bh h1{font-family:var(--font-head),"Gamja Flower";font-size:var(--fs-btitle);font-weight:700;letter-spacing:-.01em;line-height:1.15}
 .bnav{margin-left:auto;display:flex;gap:12px;align-items:center}
-.bwk{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:17px;font-weight:700}
-.bwk button{width:30px;height:30px;border-radius:50%;font-size:22px;color:var(--muted)}
+.bwk{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:var(--fs-bnav);font-weight:700;color:var(--bnav-ink)}
+.bwk button{width:30px;height:30px;border-radius:50%;font-size:22px;color:var(--bnav-ink);opacity:.6}
 .bwk button:hover{background:var(--accent-soft);color:var(--ink)}
-#bThis{background:none;border:1px solid var(--line);color:var(--accent-text);border-radius:14px;padding:8px 18px;font-weight:800;font-size:17px}
+#bThis{background:var(--bthis-bg);border:1px solid var(--line);color:var(--bthis-ink);border-radius:14px;padding:8px 18px;font-weight:800;font-size:var(--fs-bnav)}
 #bThis:hover{background:var(--accent-soft)}
 .bsub{color:var(--muted);font-size:15px;margin:4px 0 0}
 .bhint{display:block;font-size:13px;opacity:.85}
@@ -377,14 +383,16 @@ dialog input[type=date]:focus,dialog input[type=time]:focus,dialog input.tagin:f
 .bday{border:1px solid var(--line);border-radius:18px;padding:10px 12px;min-height:222px;background:var(--day-bg);color:var(--day-ink);
   --ink:var(--day-ink);--muted:color-mix(in srgb,var(--day-ink) 55%,var(--day-bg));--line:color-mix(in srgb,var(--day-ink) 12%,var(--day-bg))}
 .bday.tdy{background:color-mix(in srgb,var(--accent) 16%,var(--day-bg))}
-.bday .dn{text-align:center;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:6px;letter-spacing:.05em}
-.bday .dn b{display:block;font-size:26px;font-weight:700;color:var(--ink);line-height:1.1}
+.bday .dn{text-align:center;font-size:var(--fs-dname);color:var(--dname-ink,var(--muted));border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:6px;letter-spacing:.05em}
+.bday .dn b{display:block;font-size:var(--fs-dnum);font-weight:700;color:var(--dnum-ink,var(--ink));line-height:1.1}
 .bday.tdy .dn,.bday.tdy .dn b{color:var(--accent-text)}   /* today = theme colour (Sun / Sat keep red / blue below) */
 .bday.sun .dn,.bday.sun .dn b{color:var(--sun)}.bday.sat .dn,.bday.sat .dn b{color:var(--sat)}
 .blist{list-style:none;padding:0;min-height:36px}
 .bday .item,.bcat .item{font-size:var(--fs-day);min-height:30px;padding:3px 2px;gap:8px;align-items:flex-start}
 .bday .item .sp,.bday .item .pill,.bcat .item .sp,.bcat .item .pill{display:none}   /* tags stay on the task but are not drawn on the cards */
 .bday .item .chk,.bcat .item .chk{width:19px;height:19px;border-width:2px;margin-top:2px}
+body.show-overdue .item.overdue .t{color:var(--today)}
+body.show-overdue .item.overdue .chk{border-color:var(--today)}   /* Settings > Board > Unfinished tasks (off by default) */
 .item .tm{font-size:.75em;color:var(--muted);margin-right:4px;font-weight:400}
 .bday .item .x,.bcat .item .x{position:absolute;right:0;top:2px;padding:0 5px;border-radius:8px;background:inherit}
 .bday .item,.bcat .item{position:relative}
@@ -593,7 +601,12 @@ const defaultCats=()=>[
 let db={events:[],todos:[],tags:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.events&&s.todos)db=s}catch(e){}
 db.tags=db.tags||[];db.tagSort=db.tagSort||{};db.tagColors=db.tagColors||{};db.customColors=db.customColors||[];db.hiddenColors=db.hiddenColors||[];db.paletteOrder=db.paletteOrder||[];db.showDone=db.showDone||{};db.categories=db.categories||defaultCats();
-const normSettings=()=>{const o=db.settings=db.settings||{};o.sizes=o.sizes||{};o.colors=o.colors||{}};normSettings();
+const normSettings=()=>{
+  const o=db.settings=db.settings||{};o.sizes=o.sizes||{};o.colors=o.colors||{};
+  const mig=(box,old,news)=>{if(o[box][old]!=null){news.forEach(n=>{if(o[box][n]==null)o[box][n]=o[box][old]});delete o[box][old]}};   // one shared value became two
+  mig('colors','listBg',['mBg','wBg']);mig('colors','listInk',['mInk','wInk']);
+  mig('sizes','title',['mTitle','wTitle']);mig('sizes','item',['mItem','wItem']);mig('sizes','pill',['mPill','wPill']);
+};normSettings();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
 
 const today=new Date();
@@ -1094,20 +1107,15 @@ const FONTS=[['Pretendard Variable','sans'],['Gaegu','handwriting'],['Nanum Pen 
   ['Gowun Dodum','rounded'],['Noto Sans KR','sans'],['IBM Plex Sans KR','sans'],['Inter','sans'],['Playfair Display','serif'],['Dancing Script','script'],['Caveat','script'],['System UI','system']];
 const fontCss=n=>n==='System UI'?'system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif':`"${n}"`;
 const SIZES=[['base','Base text','--fs-base',12,26,17],['bigdate','Big date','--fs-bigdate',24,90,44],['head','Month buttons','--fs-head',10,22,13],
-  ['title','Card titles','--fs-title',16,44,28],['item','Item text','--fs-item',12,36,22],['pill','Tag chips','--fs-pill',10,24,15],
-  ['btitle','Board title','--fs-btitle',16,60,34],['day','Day card text','--fs-day',10,28,16],['cat','Category title','--fs-cat',12,44,25],
-  ['mini','Mini calendar','--fs-mini',10,22,12.5]];
-const COLS=[['bg','Page background','--bg'],['card','Card background','--card'],['ink','Text','--ink'],['accent','Highlight','--accent'],['today','Alert (delete buttons)','--today'],['sun','Sunday','--sun'],['sat','Saturday','--sat'],
-  ['headInk','Header text','--head-ink'],['listBg','To-do cards background','--list-bg'],['listInk','To-do cards text','--list-ink'],
-  ['boardBg','Board background','--board-bg'],['boardInk','Board text','--board-ink'],['day','Day card background','--day-bg'],['dayInk','Day card text','--day-ink'],['catInk','Category card text','--cat-ink'],
-  ['miniBg','Calendar background','--mini-bg'],['miniInk','Calendar text','--mini-ink']];
-const COLOR_GROUPS=[['Overall',['bg','card','ink','today','sun','sat']],['Header',['headInk']],['Monthly & Weekly to-do',['listBg','listInk']],
-  ['Task board',['boardBg','boardInk','day','dayInk','catInk']],['Mini calendar',['miniBg','miniInk']]];
-const AREA_KEYS=['headInk','listBg','listInk','boardBg','boardInk','day','dayInk','catInk','miniBg','miniInk'];
-const mixW=(hex,t)=>'#'+[1,3,5].map(k=>Math.round(255-(255-parseInt(hex.substr(k,2),16))*t).toString(16).padStart(2,'0')).join('');   // blend toward white
-const CLASSIC=[['Ivory',{bg:'#fbf9f2',card:'#fffefb',ink:'#2b2622',accent:'#f7b5cc',today:'#e26d5a'}],['White',{bg:'#ffffff',card:'#fffefb',ink:'#2b2622',accent:'#f7b5cc',today:'#e26d5a'}],
-  ['Dark',{bg:'#1d1a17',card:'#26221e',ink:'#f0e9de',accent:'#f7b5cc',today:'#ee7f6c'}]];
-const PRESETS=[...CLASSIC,...COLORS.map((c,i)=>[PASTEL_NAMES[i],{bg:mixW(c,.16),card:mixW(c,.05),ink:'#2b2622',accent:c,today:'#e26d5a'}])];
+  ['mTitle','Monthly: title','--fs-m-title',16,44,28],['mItem','Monthly: item text','--fs-m-item',12,36,22],['mPill','Monthly: tag chips','--fs-m-pill',10,24,15],
+  ['wTitle','Weekly: title','--fs-w-title',16,44,28],['wItem','Weekly: item text','--fs-w-item',12,36,22],['wPill','Weekly: tag chips','--fs-w-pill',10,24,15],
+  ['btitle','Board title','--fs-btitle',16,60,34],['bnav','Week range & button','--fs-bnav',12,28,17],['dname','Day name (SUN…)','--fs-dname',10,24,14],['dnum','Date number (25…)','--fs-dnum',14,48,26],
+  ['day','Task text','--fs-day',10,28,16],['cat','Category title','--fs-cat',12,44,25],['mini','Mini calendar text','--fs-mini',10,22,12.5]];
+const COLS=[['bg','Page background','--bg'],['card','Card background','--card'],['ink','Text','--ink'],['accent','Highlight','--accent'],['today','Alert / overdue red','--today'],['sun','Sunday','--sun'],['sat','Saturday','--sat'],
+  ['headInk','Date & months text','--head-ink'],['mBg','Monthly: background','--m-bg'],['mInk','Monthly: text','--m-ink'],['wBg','Weekly: background','--w-bg'],['wInk','Weekly: text','--w-ink'],
+  ['boardBg','Board background','--board-bg'],['boardInk','Board text','--board-ink'],['bnavInk','Week range text','--bnav-ink'],['bthisInk','This Week text','--bthis-ink'],['bthisBg','This Week background','--bthis-bg'],
+  ['day','Day card background','--day-bg'],['dnameInk','Day name text','--dname-ink'],['dnumInk','Date number text','--dnum-ink'],['dayInk','Task text','--day-ink'],['catInk','Category card text','--cat-ink'],
+  ['miniBg','Background','--mini-bg'],['miniInk','Text','--mini-ink']];
 /* uploaded fonts: kept in IndexedDB on this device only (too big for localStorage, and not part of Backup) */
 const MAXFONTS=5, uploaded=[], faces=new Map();
 const fdb=()=>new Promise((res,rej)=>{const r=indexedDB.open('planner-fonts',1);
@@ -1154,79 +1162,98 @@ function applySettings(){
   set('--accent-soft',(c.accent||c.card)&&'color-mix(in srgb,var(--accent) 18%,var(--card))');
   set('--accent-ink',c.accent&&'color-mix(in srgb,var(--accent) 30%,#241a1e)');   // readable text on the highlight colour
   const m=document.querySelector('meta[name=theme-color]');if(m)m.content=c.bg||'#ffffff';
+  document.body.classList.toggle('show-overdue',st.overdue===true);
   setHourHeight();
 }
 const scaleFactor=p=>{p=p==null?50:p;return p<=50?.7+.3*p/50:1+.5*(p-50)/50};   // 0 -> 70%, 50 -> 100% (current), 100 -> 150%
 const pct=p=>Math.round(scaleFactor(p)*100)+'%';
-const SIZE_GROUPS=[['Header',['bigdate','head']],['Monthly & Weekly to-do',['title','item','pill']],['Task board',['btitle','day','cat']],['Mini calendar',['mini']],['Everything else',['base']]];
-const TABS=[['look','Look'],['colours','Colours'],['sizes','Sizes'],['board','Board'],['data','Data']];
-let settingsTab='look';const sOpen={};
+/* Settings are organised by what you see on the screen: General / Header / To-do / Board / Data.
+   Every part has its own size, text colour and background where that makes sense; ↺ puts one back to its default. */
+const TAB_DEF=[
+  ['general','General',[
+    ['Fonts','fonts'],
+    ['Overall text size','scale'],
+    ['Colours',['c:bg','c:card','c:ink','c:sun','c:sat','c:today']],
+    ['Everything else',['s:base']]]],
+  ['header','Header',[
+    ['Date & months',['s:bigdate','c:headInk','s:head']],
+    ['Mini calendar',['s:mini','c:miniBg','c:miniInk']]]],
+  ['todo','To-do',[
+    ['Monthly To-do',['c:mBg','c:mInk','s:mTitle','s:mItem','s:mPill']],
+    ['Weekly To-do',['c:wBg','c:wInk','s:wTitle','s:wItem','s:wPill']]]],
+  ['board','Board',[
+    ['Week navigation',['s:bnav','c:bnavInk','c:bthisInk','c:bthisBg']],
+    ['Board',['s:btitle','c:boardBg','c:boardInk']],
+    ['Day cards',['c:day','s:dname','c:dnameInk','s:dnum','c:dnumInk','s:day','c:dayInk']],
+    ['Category cards',['s:cat','c:catInk']],
+    ['Unfinished tasks','overdue'],
+    ['Categories','cats']]],
+  ['data','Data',[['Your data','data'],['Reset','reset']]]];
+const TABS=TAB_DEF.map(([k,l])=>[k,l]);
+const COLOR_FALLBACK={dnameInk:'#8a8177',dnumInk:'#2b2622',bthisBg:'#ffffff'};   // colours that have no variable until you set them
+let settingsTab='general';
+// hovering or editing a section outlines the part of the page it changes
+const AREA_OF={'Date & months':'.head','Mini calendar':'.card.mini','Monthly To-do':'#mtodo','Weekly To-do':'#wtodo','Week navigation':'.bnav',
+  'Board':'#board','Day cards':'#bdays','Category cards':'#bcats','Unfinished tasks':'#bdays','Categories':'#bcats'};
 function buildSettings(){
-  const st=db.settings,cs=getComputedStyle(document.documentElement),sc=scaleFactor(st.textScale);
-  const hex=v=>{const x=cs.getPropertyValue(v).trim();return /^#[0-9a-f]{6}$/i.test(x)?x:'#000000'};
+  const st=db.settings,cs=getComputedStyle(document.documentElement);
+  const hex=(k,v)=>{const x=cs.getPropertyValue(v).trim();return /^#[0-9a-f]{6}$/i.test(x)?x:(COLOR_FALLBACK[k]||'#000000')};
   const opt=sel=>FONTS.map(([n,t])=>`<option value="${n}" ${n===sel?'selected':''}>${n}</option>`).join('')+(uploaded.length?`<optgroup label="My fonts">${uploaded.map(n=>`<option value="${esc(n)}" ${n===sel?'selected':''}>${esc(n)}</option>`).join('')}</optgroup>`:'');
-  const size=k=>{const [,l,,mn,mx,d]=SIZES.find(x=>x[0]===k);return `<div class="row2"><label for="z_${k}">${l}</label><input type="range" id="z_${k}" data-k="${k}" min="${mn}" max="${mx}" step="0.5" value="${st.sizes[k]||d}"><output>${st.sizes[k]||d}</output></div>`};
-  const color=k=>{const [,l,v]=COLS.find(x=>x[0]===k),on=!!st.colors[k];return `<div class="row2"><label for="c_${k}">${l}</label><input type="color" id="c_${k}" data-k="${k}" value="${st.colors[k]||hex(v)}">${on?`<button type="button" class="rst" data-k="${k}" title="Back to the default">↺</button>`:'<span class="rst0"></span>'}</div>`};
-  const det=(k,title,inner)=>`<details data-k="${k}" ${sOpen[k]?'open':''}><summary>${title}</summary>${inner}</details>`;
-  const pages={
-    look:`<h4>Highlight colour</h4>
-      <p class="hint">Selected month, + / # buttons, This Week, tabs and other highlights.</p>
-      <div class="hlrow">${COLORS.map(c=>`<button type="button" class="hl ${(st.colors.accent||'#f7b5cc').toLowerCase()===c?'on':''}" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}<label class="hl pick" title="Any colour"><input type="color" id="hlCustom" value="${st.colors.accent||'#f7b5cc'}"></label></div>
-      <div class="hlprev"><span>Dec</span><span>+</span><span>This Week</span></div>
-      <h4>Theme</h4>
-      <div class="presets">${CLASSIC.map(([n,p])=>`<button data-p="${n}"><i style="background:linear-gradient(135deg,${p.bg} 50%,${p.accent} 50%)"></i>${n}</button>`).join('')}</div>
-      <div class="swatches">${PRESETS.slice(CLASSIC.length).map(([n,p])=>`<button data-p="${n}" title="${n}" style="background:linear-gradient(135deg,${p.bg} 45%,${p.accent} 45%)"></button>`).join('')}</div>
-      <h4>Fonts</h4>
-      <div class="row2"><label>Main font</label><select id="sFont">${opt(st.font||'Gaegu')}</select></div>
+  const rst=(on,attr)=>on?`<button type="button" class="rst" ${attr} title="Back to the default">↺</button>`:'<span class="rst0"></span>';
+  const size=k=>{const [,l,,mn,mx,d]=SIZES.find(x=>x[0]===k);return `<div class="row2"><label for="z_${k}">${l}</label><input type="range" id="z_${k}" data-k="${k}" min="${mn}" max="${mx}" step="0.5" value="${st.sizes[k]||d}"><output>${st.sizes[k]||d}</output>${rst(!!st.sizes[k],`data-s="${k}"`)}</div>`};
+  const color=k=>{const [,l,v]=COLS.find(x=>x[0]===k);return `<div class="row2"><label for="c_${k}">${l}</label><input type="color" id="c_${k}" data-k="${k}" value="${st.colors[k]||hex(k,v)}">${rst(!!st.colors[k],`data-k="${k}"`)}</div>`};
+  const ctl=x=>x.startsWith('s:')?size(x.slice(2)):color(x.slice(2));
+  const SEC={
+    fonts:()=>`<div class="row2"><label>Main font</label><select id="sFont">${opt(st.font||'Gaegu')}</select></div>
       <div class="row2"><label>Titles &amp; date</label><select id="sFontHead"><option value="">Same as main</option>${opt(st.fontHead)}</select></div>
       <div class="sample" id="sSample">23 October · 이번 주 할 일 Weekly</div>
       <div class="row2 upl"><button type="button" id="sUp">Upload font…</button><input type="file" id="sUpFile" accept=".ttf,.otf,.woff,.woff2" hidden><span class="hint">${uploaded.length}/${MAXFONTS} · saved only in this browser</span></div>
       ${uploaded.map(n=>`<div class="myfont"><span style="font-family:'${esc(n)}',sans-serif">${esc(n)}</span><button type="button" data-del="${esc(n)}" aria-label="Remove font">×</button></div>`).join('')}`,
-    colours:`<p class="hint">Pick a colour for each part of the app. ↺ puts one back to its default.</p>
-      ${COLOR_GROUPS.map(([g,ks])=>`<h4>${g}</h4>`+ks.map(color).join('')).join('')}
-      <button type="button" class="dbtn" id="cReset"><b>Reset all colours</b><small>Back to the theme colours (highlight stays as chosen in Look)</small></button>`,
-    sizes:`${SIZE_GROUPS.map(([g,ks])=>`<h4>${g}</h4>`+ks.map(size).join('')).join('')}
-      <h4>Text size — all at once</h4>
-      <div class="row2 scale"><span class="hint">Smaller</span><input type="range" id="z_scale" min="0" max="100" step="1" value="${st.textScale??50}"><span class="hint">Larger</span></div>
-      <p class="hint" id="scaleNote">${st.textScale??50} / 100 · ${pct(st.textScale)} of the sizes above (50 = as is)</p>
-      <button type="button" class="dbtn" id="zReset"><b>Reset sizes</b><small>Every size and the all-at-once slider go back to default</small></button>`,
-    board:`<h4>Categories</h4>
-      <p class="hint">Cards under the day cards for tasks without a date.</p>
+    scale:()=>`<div class="row2 scale"><span class="hint">Smaller</span><input type="range" id="z_scale" min="0" max="100" step="1" value="${st.textScale??50}"><span class="hint">Larger</span></div>
+      <p class="hint" id="scaleNote">${st.textScale??50} / 100 · ${pct(st.textScale)} of the sizes below (50 = as is)</p>`,
+    overdue:()=>`<label class="chkrow"><input type="checkbox" id="odOn" ${st.overdue===true?'checked':''}> Show unfinished tasks from past days in red</label>
+      <p class="hint">Off by default. The red is the Alert colour in General → Colours.</p>`,
+    cats:()=>`<p class="hint">Cards under the day cards for tasks without a date. Drag ⋮⋮ to reorder.</p>
       <div id="catList">${db.categories.map(c=>`<div class="catrow" data-id="${c.id}"><span class="grab" title="Drag to reorder">⋮⋮</span><input class="ci" value="${esc(c.icon||'')}" maxlength="4" aria-label="Icon"><input class="cn" value="${esc(c.name)}" aria-label="Name"><input class="cc" type="color" value="${c.color}" aria-label="Colour"><button class="cd" aria-label="Delete category">×</button><input class="cs" value="${esc(c.desc||'')}" placeholder="Description" aria-label="Description"></div>`).join('')}</div>
-      <button type="button" class="dbtn" id="catAdd"><b>+ Add category</b></button>
-      <p class="hint">Day-card and category colours and sizes are in the Colours and Sizes tabs.</p>`,
-    data:`<h4>Your data</h4>
-      <button type="button" class="dbtn" id="dBackup"><b>Download backup</b><small>Saves everything (events, to-dos, tags, settings) to a file</small></button>
-      <button type="button" class="dbtn" id="dRestore"><b>Restore from backup</b><small>Replaces the current data with a backup file</small></button>
-      <h4>Reset</h4>
-      <button type="button" class="dbtn danger" id="sReset"><b>Reset look &amp; sizes</b><small>Fonts, sizes and colours go back to default. Your events and to-dos stay.</small></button>`
+      <button type="button" class="dbtn" id="catAdd"><b>+ Add category</b></button>`,
+    data:()=>`<button type="button" class="dbtn" id="dBackup"><b>Download backup</b><small>Saves everything (to-dos, tags, categories, settings) to a file</small></button>
+      <button type="button" class="dbtn" id="dRestore"><b>Restore from backup</b><small>Replaces the current data with a backup file</small></button>`,
+    reset:()=>`<button type="button" class="dbtn danger" id="sReset"><b>Reset the whole look</b><small>Fonts, sizes and colours go back to default. Your to-dos and categories stay.</small></button>`
   };
+  const def=TAB_DEF.find(t=>t[0]===settingsTab),keys=[];
+  def[2].forEach(([,b])=>{if(Array.isArray(b))keys.push(...b)});
+  const body=def[2].map(([t,b])=>`<section class="ssec"${AREA_OF[t]?` data-area="${AREA_OF[t]}"`:''}><h4>${t}</h4>`+(Array.isArray(b)?b.map(ctl).join(''):SEC[b]())+'</section>').join('')
+    +(keys.length||settingsTab==='general'?`<button type="button" class="dbtn" id="tReset"><b>Reset this tab</b><small>Sizes and colours on this page go back to default</small></button>`:'');
   $('#settings').innerHTML=`<header><b>Settings</b><button id="sClose" aria-label="Close">×</button></header>
     <nav class="stabs">${TABS.map(([k,l])=>`<button type="button" data-t="${k}" class="${k===settingsTab?'on':''}">${l}</button>`).join('')}</nav>
-    <div class="body">${pages[settingsTab]}</div><footer><span>Saved automatically</span></footer>`;
+    <div class="body">${body}</div><footer><span>Saved automatically</span></footer>`;
   const root=$('#settings'),all=s=>root.querySelectorAll(s),one=s=>root.querySelector(s);
+  clearFlash();
+  const flash=(sel,on)=>document.querySelectorAll(sel).forEach(e=>e.classList.toggle('flash',on));
+  all('.ssec[data-area]').forEach(sec=>{const sel=sec.dataset.area;
+    sec.onmouseenter=()=>flash(sel,true);sec.onmouseleave=()=>flash(sel,false);
+    sec.addEventListener('focusin',()=>flash(sel,true));sec.addEventListener('focusout',()=>flash(sel,false))});
+  const rebuild=()=>{const k=one('.body').scrollTop;buildSettings();$('#settings .body').scrollTop=k};   // keep the scroll position
   const sample=()=>{const s=one('#sSample');if(s)s.style.fontFamily=`${fontCss(st.fontHead||st.font||'Gaegu')},"Gamja Flower",sans-serif`};sample();
   one('#sClose').onclick=()=>toggleSettings(false);
   all('.stabs [data-t]').forEach(b=>b.onclick=()=>{settingsTab=b.dataset.t;buildSettings()});
-  all('details').forEach(d=>d.ontoggle=()=>{sOpen[d.dataset.k]=d.open});
-  const zc=one('#z_scale');if(zc)zc.oninput=()=>{st.textScale=+zc.value;applySettings();save();one('#scaleNote').textContent=`${zc.value} / 100 · ${pct(+zc.value)} of the sizes above (50 = as is)`};
+  const zc=one('#z_scale');if(zc)zc.oninput=()=>{st.textScale=+zc.value;applySettings();save();one('#scaleNote').textContent=`${zc.value} / 100 · ${pct(+zc.value)} of the sizes below (50 = as is)`};
   const f1=one('#sFont');if(f1)f1.onchange=e=>{st.font=e.target.value==='Gaegu'?'':e.target.value;applySettings();save();sample()};
   const f2=one('#sFontHead');if(f2)f2.onchange=e=>{st.fontHead=e.target.value;applySettings();save();sample()};
   const up=one('#sUp');if(up){up.onclick=()=>one('#sUpFile').click();one('#sUpFile').onchange=e=>{const f=e.target.files[0];if(f)addFontFile(f)}}
   all('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Remove this font from this browser?'))removeFont(b.dataset.del)});
-  all('input[type=range][data-k]').forEach(el=>el.oninput=()=>{
-    const d=SIZES.find(x=>x[0]===el.dataset.k)[5];el.nextElementSibling.textContent=el.value;
-    if(+el.value===d)delete st.sizes[el.dataset.k];else st.sizes[el.dataset.k]=+el.value;applySettings();save()});
-  const zs=one('#z_start');if(zs)zs.oninput=e=>{e.target.nextElementSibling.textContent=e.target.value;st.startHour=+e.target.value;save();scrollToDefault()};
-  const zh=one('#z_hours');if(zh)zh.oninput=e=>{e.target.nextElementSibling.textContent=e.target.value;st.hours=+e.target.value;applySettings();save()};
+  all('input[type=range][data-k]').forEach(el=>{
+    el.oninput=()=>{const d=SIZES.find(x=>x[0]===el.dataset.k)[5];el.nextElementSibling.textContent=el.value;
+      if(+el.value===d)delete st.sizes[el.dataset.k];else st.sizes[el.dataset.k]=+el.value;applySettings();save()};
+    el.onchange=rebuild});
   all('input[type=color][data-k]').forEach(el=>{
     el.oninput=()=>{st.colors[el.dataset.k]=el.value;applySettings();save()};
-    el.onchange=()=>{if(settingsTab==='colours')buildSettings()}});   // show the ↺ once a colour is set
-  all('.rst[data-k]').forEach(b=>b.onclick=()=>{delete st.colors[b.dataset.k];applySettings();save();buildSettings()});
-  const cr=one('#cReset');if(cr)cr.onclick=()=>{const a=st.colors.accent;st.colors={};if(a)st.colors.accent=a;applySettings();save();buildSettings()};
-  const zr=one('#zReset');if(zr)zr.onclick=()=>{st.sizes={};delete st.textScale;applySettings();save();buildSettings()};
-  all('.hl[data-c]').forEach(b=>b.onclick=()=>{st.colors.accent=b.dataset.c;applySettings();save();buildSettings()});
-  const hc=one('#hlCustom');if(hc)hc.oninput=()=>{st.colors.accent=hc.value;applySettings();save()};
+    el.onchange=rebuild});
+  all('.rst[data-k]').forEach(b=>b.onclick=()=>{delete st.colors[b.dataset.k];applySettings();save();rebuild()});
+  all('.rst[data-s]').forEach(b=>b.onclick=()=>{delete st.sizes[b.dataset.s];applySettings();save();rebuild()});
+  const tr=one('#tReset');if(tr)tr.onclick=()=>{keys.forEach(x=>{if(x.startsWith('s:'))delete st.sizes[x.slice(2)];else delete st.colors[x.slice(2)]});
+    if(settingsTab==='general')delete st.textScale;applySettings();save();buildSettings()};
+  const od=one('#odOn');if(od)od.onchange=()=>{st.overdue=od.checked;applySettings();save()};
   const cl=one('#catList');
   if(cl){
     cl.addEventListener('input',e=>{
@@ -1237,19 +1264,20 @@ function buildSettings(){
       const b=e.target.closest('.cd');if(!b)return;
       const c=db.categories.find(x=>x.id===b.closest('.catrow').dataset.id),n=db.todos.filter(t=>t.cat===c.id).length;
       if(n&&!confirm(`Delete "${c.name}"? Its ${n} task${n>1?'s':''} will move to the Weekly To-do list.`))return;
-      db.todos.forEach(t=>{if(t.cat===c.id)delete t.cat});db.categories=db.categories.filter(x=>x!==c);save();renderAll(true);buildSettings()});
+      db.todos.forEach(t=>{if(t.cat===c.id)delete t.cat});db.categories=db.categories.filter(x=>x!==c);save();renderAll(true);rebuild()});
     Sortable.create(cl,{handle:'.grab',animation:150,onEnd:()=>{db.categories=[...cl.children].map(r=>db.categories.find(c=>c.id===r.dataset.id));save();renderBoard()}});
   }
-  const ca=one('#catAdd');if(ca)ca.onclick=()=>{db.categories.push({id:uid(),name:'New category',icon:'📌',desc:'',color:COLORS[db.categories.length%COLORS.length]});save();renderAll(true);buildSettings()};
-  all('[data-p]').forEach(b=>b.onclick=()=>{AREA_KEYS.forEach(k=>delete st.colors[k]);Object.assign(st.colors,PRESETS.find(x=>x[0]===b.dataset.p)[1]);applySettings();save();buildSettings()});   // a theme also clears the per-area colours
+  const ca=one('#catAdd');if(ca)ca.onclick=()=>{db.categories.push({id:uid(),name:'New category',icon:'📌',desc:'',color:COLORS[db.categories.length%COLORS.length]});save();renderAll(true);rebuild()};
   const bk=one('#dBackup');if(bk)bk.onclick=()=>$('#exp').click();
   const rs=one('#dRestore');if(rs)rs.onclick=()=>$('#imp').click();
   const rt=one('#sReset');if(rt)rt.onclick=()=>{if(confirm('Reset fonts, sizes and colours to default?')){db.settings={sizes:{},colors:{}};applySettings();save();buildSettings()}};
 }
 function toggleSettings(on){
   const p=$('#settings');on=on===undefined?p.hidden:on;
-  if(on)buildSettings();p.hidden=!on;
+  if(on)buildSettings();else clearFlash();
+  p.hidden=!on;document.body.classList.toggle('sopen',on);   // the page slides left so nothing is hidden behind the panel
 }
+const clearFlash=()=>document.querySelectorAll('.flash').forEach(e=>e.classList.remove('flash'));
 $('#gear').onclick=()=>toggleSettings();
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#settings').hidden&&!$('#dlg').open&&!/INPUT|SELECT/.test(document.activeElement.tagName))toggleSettings(false)});
 
